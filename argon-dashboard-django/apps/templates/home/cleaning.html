@@ -1,0 +1,1151 @@
+{% extends 'layouts/base.html' %} {% block title %} File Upload {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}
+<style>
+    .container {
+        width: 600px;
+        /* height:150px; */
+        margin: auto;
+    }
+    .progressbar {
+        counter-reset: step;
+        width: 100%;
+    }
+    .progressbar li {
+        list-style-type: none;
+        width: 20%;
+        float: left;
+        font-size: 12px;
+        position: relative;
+        text-align: center;
+        text-transform: uppercase;
+        color: #7d7d7d;
+    }
+    .progressbar li:before {
+        width: 30px;
+        height: 30px;
+        content: counter(step);
+        counter-increment: step;
+        line-height: 30px;
+        border: 2px solid #7d7d7d;
+        display: block;
+        text-align: center;
+        margin: 0 auto 10px auto;
+        border-radius: 50%;
+        background-color: white;
+    }
+    .progressbar li:after {
+        width: 100%;
+        height: 2px;
+        content: "";
+        position: absolute;
+        background-color: #7d7d7d;
+        top: 15px;
+        left: -50%;
+        z-index: -1;
+    }
+    .progressbar li:first-child:after {
+        content: none;
+    }
+    .progressbar li.active {
+        color: green;
+    }
+    .progressbar li.active:before {
+        border-color: #55b776;
+    }
+    .progressbar li.active + li:after {
+        background-color: #55b776;
+    }
+</style>
+{% endblock stylesheets %} {% block content %}
+
+<!-- Header -->
+<div class="header bg-gradient-primary pb-8 pt-5">
+    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4" style="width: max-content">
+        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+            <li class="breadcrumb-item">
+                <a href="/"><i class="fas fa-home"></i></a>
+            </li>
+            <li class="breadcrumb-item"><a href="/projects/createnew/">AI Project</a></li>
+            <li class="breadcrumb-item"><a href="#">{{ projectName }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Transform Data</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="container-fluid mt--7">
+    <div class="row">
+        <div class="col">
+            <div class="card shadow">
+                <div class="card-header border-0">
+                    <div class="container">
+                        <ul class="progressbar">
+                            <li>Create Project</li>
+                            <li>Select Data</li>
+                            <li class="active">Transform Data</li>
+                            <li>Select Parameter</li>
+                            <li>See Results</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="m-5" id="transformerGroup">
+                    {% comment %} start {% endcomment %}
+                    <!-- START UPLOAD DATA -->
+                    <form action= "{% url 'dataCleaning' %}" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="mb-0">Input Data</h2>
+                            </div>
+
+                            <div class="card-body">
+                                <p>
+                                {{ form.file }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center align-items-center p-3">
+                            <input type="submit" class="btn btn-primary" id="uploadBtn" value="Upload File"/>
+                        </div>
+                    </form> 
+                    <!-- END UPLOAD DATA -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="mb-0">Apply Transformers</h2>
+                        </div>
+
+                        <div class="card-body">
+                            <p class="card-text mb-2">
+                                Data transformation is the process of converting raw data into a format that would be
+                                more suitable for model building. Select below categories to apply transformation to
+                                convert raw data into features.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="nav-wrapper">
+                        <ul class="nav nav-pills nav-fill flex-column flex-md-row" id="tabs-icons-text" role="tablist">
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link mb-sm-3 mb-md-0 active"
+                                    id="tabs-icons-text-1-tab"
+                                    data-toggle="tab"
+                                    href="#tabs-icons-text-1"
+                                    role="tab"
+                                    aria-controls="tabs-icons-text-1"
+                                    aria-selected="true"
+                                    ><i class="ni ni-settings mr-2"></i>Handle Missing Data</a
+                                >
+                            </li>
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link mb-sm-3 mb-md-0"
+                                    id="tabs-icons-text-2-tab"
+                                    data-toggle="tab"
+                                    href="#tabs-icons-text-2"
+                                    role="tab"
+                                    aria-controls="tabs-icons-text-2"
+                                    aria-selected="false"
+                                    ><i class="ni ni-check-bold mr-2"></i>Feature Selection</a
+                                >
+                            </li>
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link mb-sm-3 mb-md-0"
+                                    id="tabs-icons-text-3-tab"
+                                    data-toggle="tab"
+                                    href="#tabs-icons-text-3"
+                                    role="tab"
+                                    aria-controls="tabs-icons-text-3"
+                                    aria-selected="false"
+                                    ><i class="ni ni-sound-wave mr-2"></i>Outlier Removal</a
+                                >
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card shadow">
+                        <div class="card-body">
+                            <div class="tab-content" id="myTabContent">
+                                <div
+                                    class="tab-pane fade show active"
+                                    id="tabs-icons-text-1"
+                                    role="tabpanel"
+                                    aria-labelledby="tabs-icons-text-1-tab"
+                                >
+                                    <div class="card-body">
+                                        <div class="row mb-1 pb-1">
+                                            <!-- Button trigger modal -->
+                                            <div class="col-lg-4">
+                                                <div
+                                                    class="card h-100 bg-primary"
+                                                    style="border-radius: 25px; height: 5px"
+                                                >
+                                                    <div class="card-body pt-3 pb-1">
+                                                        <h5 class="h3 text-uppercase text-secondary">
+                                                            Mean Median Imputer
+                                                        </h5>
+                                                        <p class="text-secondary">
+                                                            <small
+                                                                >Replaces missing numerical data by the mean or median
+                                                                value of the variable</small
+                                                            >
+                                                        </p>
+                                                        <button
+                                                            class="btn btn-sm btn-secondary"
+                                                            data-toggle="modal"
+                                                            data-target="#exampleModal1"
+                                                            data-placement="bottom"
+                                                        >
+                                                            Apply
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Modal -->
+                                            <div
+                                                class="modal fade"
+                                                id="exampleModal1"
+                                                tabindex="-1"
+                                                role="dialog"
+                                                aria-labelledby="exampleModalLabel"
+                                                aria-hidden="true"
+                                            >
+                                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLabel">
+                                                                Mean Median Imputer
+                                                            </h5>
+                                                            <button
+                                                                type="button"
+                                                                class="close"
+                                                                data-dismiss="modal"
+                                                                aria-label="Close"
+                                                            >
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="card bg-secondary border-0 mb-0">
+                                                                <div class="card-body px-lg-5 py-lg-5">
+                                                                    <form
+                                                                        method="post"
+                                                                        enctype="multipart/form-data"
+                                                                        id="meanMedianForm"
+                                                                    >
+                                                                        {% csrf_token %}
+                                                                        <label for="method">Choose a method:</label>
+                                                                        <select
+                                                                            name="method"
+                                                                            id="method"
+                                                                            class="form-control"
+                                                                        >
+                                                                            <option value="mean">Mean</option>
+                                                                            <option value="median">Median</option>
+                                                                        </select>
+
+                                                                        <br /><br />
+                                                                        <button
+                                                                            type="submit"
+                                                                            name="transformer"
+                                                                            form="meanMedianForm"
+                                                                            value="meanMedian"
+                                                                            class="btn btn-primary btn-sm"
+                                                                        >
+                                                                            Transform
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Button trigger modal -->
+                                            <div class="col-lg-4">
+                                                <div
+                                                    class="card h-100 bg-primary"
+                                                    style="border-radius: 25px; height: 5px"
+                                                    title=""
+                                                >
+                                                    <div class="card-body pt-3 pb-1">
+                                                        <h5 class="h3 text-secondary text-uppercase">
+                                                            Arbitrary Number Imputer
+                                                        </h5>
+                                                        <p class="text-secondary">
+                                                            <small>
+                                                                Replaces missing numerical data by an arbitrary value
+                                                            </small>
+                                                        </p>
+                                                        <button
+                                                            class="btn btn-sm btn-secondary"
+                                                            data-toggle="modal"
+                                                            data-target="#exampleModal2"
+                                                            data-placement="bottom"
+                                                        >
+                                                            Apply
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Modal -->
+                                            <div
+                                                class="modal fade"
+                                                id="exampleModal2"
+                                                tabindex="-1"
+                                                role="dialog"
+                                                aria-labelledby="exampleModalLabel2"
+                                                aria-hidden="true"
+                                            >
+                                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLabel2">
+                                                                Arbitrary Number Imputer
+                                                            </h5>
+                                                            <button
+                                                                type="button"
+                                                                class="close"
+                                                                data-dismiss="modal"
+                                                                aria-label="Close"
+                                                            >
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="card bg-secondary border-0 mb-0">
+                                                                <div class="card-body px-lg-5 py-lg-5">
+                                                                    <form
+                                                                        method="post"
+                                                                        enctype="multipart/form-data"
+                                                                        id="arbitraryImputerForm"
+                                                                    >
+                                                                        {% csrf_token %}
+                                                                        <label for="arbitraryValue"
+                                                                            >Please enter the arbitrary value:</label
+                                                                        >
+                                                                        <input
+                                                                            type="number"
+                                                                            step="0.001"
+                                                                            id="arbitraryValue"
+                                                                            name="arbitraryValue"
+                                                                            class="form-control"
+                                                                        /><br /><br />
+                                                                        <button
+                                                                            type="submit"
+                                                                            name="transformer"
+                                                                            form="arbitraryImputerForm"
+                                                                            value="arbitraryImputer"
+                                                                            class="btn btn-primary btn-sm"
+                                                                        >
+                                                                            Transform
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Button trigger modal -->
+                                            <div class="col-lg-4">
+                                                <div
+                                                    class="card h-100 bg-primary"
+                                                    style="border-radius: 25px; height: 5px"
+                                                    title=""
+                                                >
+                                                    <div class="card-body pt-3 pb-1">
+                                                        <h5 class="h3 text-secondary text-uppercase">
+                                                            Categorical Imputer
+                                                        </h5>
+                                                        <p class="text-secondary">
+                                                            <small>
+                                                                Replaces missing data of categorical columns by an
+                                                                arbitrary value or by the most frequent category
+                                                            </small>
+                                                        </p>
+                                                        <button
+                                                            class="btn btn-sm btn-secondary"
+                                                            data-toggle="modal"
+                                                            data-target="#exampleModal7"
+                                                            data-placement="bottom"
+                                                        >
+                                                            Apply
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Modal -->
+                                            <div
+                                                class="modal fade"
+                                                id="exampleModal7"
+                                                tabindex="-1"
+                                                role="dialog"
+                                                aria-labelledby="exampleModalLabel7"
+                                                aria-hidden="true"
+                                            >
+                                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLabel7">
+                                                                Categorical Imputer
+                                                            </h5>
+                                                            <button
+                                                                type="button"
+                                                                class="close"
+                                                                data-dismiss="modal"
+                                                                aria-label="Close"
+                                                            >
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="card bg-secondary border-0 mb-0">
+                                                                <div class="card-body px-lg-5 py-lg-5">
+                                                                    <form
+                                                                        method="post"
+                                                                        enctype="multipart/form-data"
+                                                                        id="categoricalImputerForm"
+                                                                    >
+                                                                        {% csrf_token %}
+                                                                        <div id="manualSelectCol">
+                                                                            <label for="catColumns"
+                                                                                >Select Columns:
+                                                                            </label>
+
+                                                                            <select
+                                                                                data-placeholder="Choose columns to drop"
+                                                                                class="select form-control chosen-select"
+                                                                                multiple
+                                                                                name="catColumns"
+                                                                                id="catColumns"
+                                                                                required
+                                                                            >
+                                                                                <!-- <option value="all" selected>Select All</option> -->
+                                                                                {% for col in categorical_features %}
+                                                                                <option value="{{ col }}">
+                                                                                    {{ col }}
+                                                                                </option>
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div>
+                                                                        <br />
+                                                                        <label for="methodCat">Choose a method:</label>
+                                                                        <select
+                                                                            name="methodCat"
+                                                                            id="methodCat"
+                                                                            onchange="yesnoCheck(this);"
+                                                                            class="form-control"
+                                                                        >
+                                                                            <option value="most_frequent">
+                                                                                Most Frequent
+                                                                            </option>
+                                                                            <option value="constant">
+                                                                                Enter Manually
+                                                                            </option>
+                                                                        </select>
+                                                                        <br />
+                                                                        <div id="ifYes" style="display: none">
+                                                                            <br />
+                                                                            <label for="fillna_value"
+                                                                                >Enter the value:
+                                                                            </label>
+                                                                            <input
+                                                                                type="text"
+                                                                                id="fillna_value"
+                                                                                name="fillna_value"
+                                                                                class="form-control"
+                                                                            />
+                                                                        </div>
+                                                                        <br />
+                                                                        <button
+                                                                            type="submit"
+                                                                            name="transformer"
+                                                                            form="categoricalImputerForm"
+                                                                            value="categoricalImputer"
+                                                                            class="btn btn-primary btn-sm"
+                                                                        >
+                                                                            Transform
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                    class="tab-pane fade"
+                                    id="tabs-icons-text-2"
+                                    role="tabpanel"
+                                    aria-labelledby="tabs-icons-text-2-tab"
+                                >
+                                    <div class="card-body">
+                                        <div class="row mb-1 pb-1">
+                                            <!-- Button trigger modal -->
+                                            <div class="col-lg-4">
+                                                <div
+                                                    class="card h-100 bg-primary"
+                                                    style="border-radius: 25px; height: 5px"
+                                                    title=""
+                                                >
+                                                    <div class="card-body pt-3 pb-1">
+                                                        <h5 class="h3 text-secondary text-uppercase">
+                                                            Drop Arbitrary Features
+                                                        </h5>
+                                                        <p class="text-secondary">
+                                                            <small> Drops a list of selected columns </small>
+                                                        </p>
+                                                        <button
+                                                            class="btn btn-sm btn-secondary"
+                                                            data-toggle="modal"
+                                                            data-target="#exampleModal3"
+                                                            data-placement="bottom"
+                                                        >
+                                                            Apply
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Modal -->
+                                            <div
+                                                class="modal fade"
+                                                id="exampleModal3"
+                                                tabindex="-1"
+                                                role="dialog"
+                                                aria-labelledby="exampleModalLabel"
+                                                aria-hidden="true"
+                                            >
+                                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLabel">
+                                                                Drop Arbitrary Features
+                                                            </h5>
+                                                            <button
+                                                                type="button"
+                                                                class="close"
+                                                                data-dismiss="modal"
+                                                                aria-label="Close"
+                                                            >
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="card bg-secondary border-0 mb-0">
+                                                                <div class="card-body px-lg-5 py-lg-5">
+                                                                    <form
+                                                                        method="post"
+                                                                        enctype="multipart/form-data"
+                                                                        id="dropFeaturesForm"
+                                                                    >
+                                                                        {% csrf_token %}
+                                                                        <div id="manualSelectCol">
+                                                                            <h6 style="font-size: 1.1rem">
+                                                                                Select columns to drop
+                                                                            </h6>
+
+                                                                            <select
+                                                                                data-placeholder="Choose columns to drop"
+                                                                                class="select form-control chosen-select"
+                                                                                multiple
+                                                                                name="dropColumns"
+                                                                                id="dropColumns"
+                                                                            >
+                                                                                {% for col in columns %}
+                                                                                <option value="{{ col }}">
+                                                                                    {{ col }}
+                                                                                </option>
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div>
+
+                                                                        <br />
+                                                                        <button
+                                                                            type="submit"
+                                                                            name="transformer"
+                                                                            form="dropFeaturesForm"
+                                                                            value="dropFeatures"
+                                                                            class="btn btn-primary btn-sm"
+                                                                        >
+                                                                            Transform
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Button trigger modal -->
+                                            <div class="col-lg-4">
+                                                <div
+                                                    class="card h-100 bg-primary"
+                                                    style="border-radius: 25px; height: 5px"
+                                                    title=""
+                                                >
+                                                    <div class="card-body pt-3 pb-1">
+                                                        <h5 class="h3 text-secondary text-uppercase">
+                                                            Drop Correlated Feature
+                                                        </h5>
+                                                        <p class="text-secondary">
+                                                            <small>
+                                                                Removes similar numerical columns based on correlation
+                                                                threshold
+                                                            </small>
+                                                        </p>
+                                                        <button
+                                                            class="btn btn-sm btn-secondary"
+                                                            data-toggle="modal"
+                                                            data-target="#exampleModal4"
+                                                            data-placement="bottom"
+                                                        >
+                                                            Apply
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Modal -->
+                                            <div
+                                                class="modal fade"
+                                                id="exampleModal4"
+                                                tabindex="-1"
+                                                role="dialog"
+                                                aria-labelledby="exampleModalLabel"
+                                                aria-hidden="true"
+                                            >
+                                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLabel">
+                                                                Drop Correlated Features
+                                                            </h5>
+                                                            <button
+                                                                type="button"
+                                                                class="close"
+                                                                data-dismiss="modal"
+                                                                aria-label="Close"
+                                                            >
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="card bg-secondary border-0 mb-0">
+                                                                <div class="card-body px-lg-5 py-lg-5">
+                                                                    <form
+                                                                        method="post"
+                                                                        enctype="multipart/form-data"
+                                                                        id="dropCorrFeaturesForm"
+                                                                    >
+                                                                        {% csrf_token %}
+                                                                        <label for="corrThreshold"
+                                                                            >Correlation threshold is between 0 to 1.
+                                                                            Correlation values between 0.9 and 1.0
+                                                                            indicate columns that are very highly
+                                                                            similar or correlated.
+                                                                            <br />
+                                                                            <br />
+                                                                            Please enter the correlation
+                                                                            threshold:</label
+                                                                        >
+                                                                        <input
+                                                                            type="number"
+                                                                            step="0.01"
+                                                                            min="0"
+                                                                            max="1"
+                                                                            id="corrThreshold"
+                                                                            name="corrThreshold"
+                                                                            class="form-control"
+                                                                        /><br /><br /><br />
+                                                                        <button
+                                                                            type="submit"
+                                                                            name="transformer"
+                                                                            form="dropCorrFeaturesForm"
+                                                                            value="dropCorrFeatures"
+                                                                            class="btn btn-primary btn-sm"
+                                                                        >
+                                                                            Transform
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Button trigger modal -->
+                                            <div class="col-lg-4">
+                                                <div
+                                                    class="card h-100 bg-primary"
+                                                    style="border-radius: 25px; height: 5px"
+                                                    title=""
+                                                >
+                                                    <div class="card-body pt-3 pb-1">
+                                                        <h5 class="h3 text-secondary text-uppercase">Replace Value</h5>
+                                                        <p class="text-secondary">
+                                                            <small>Replaces a value in the selected column</small>
+                                                        </p>
+                                                        <button
+                                                            class="btn btn-sm btn-secondary"
+                                                            data-toggle="modal"
+                                                            data-target="#exampleModal8"
+                                                            data-placement="bottom"
+                                                        >
+                                                            Apply
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Modal -->
+                                            <div
+                                                class="modal fade"
+                                                id="exampleModal8"
+                                                tabindex="-1"
+                                                role="dialog"
+                                                aria-labelledby="exampleModalLabel"
+                                                aria-hidden="true"
+                                            >
+                                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLabel">
+                                                                Replace Value
+                                                            </h5>
+                                                            <button
+                                                                type="button"
+                                                                class="close"
+                                                                data-dismiss="modal"
+                                                                aria-label="Close"
+                                                            >
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="card bg-secondary border-0 mb-0">
+                                                                <div class="card-body px-lg-5 py-lg-5">
+                                                                    <form
+                                                                        method="post"
+                                                                        enctype="multipart/form-data"
+                                                                        id="replaceValueForm"
+                                                                    >
+                                                                        {% csrf_token %}
+                                                                        <div id="manualSelectCol">
+                                                                            <label for="replaceColumn"
+                                                                                >Select Column:
+                                                                            </label>
+
+                                                                            <select
+                                                                                data-placeholder="Choose column"
+                                                                                class="select form-control chosen-select"
+                                                                                name="replaceColumn"
+                                                                                id="replaceColumn"
+                                                                                required
+                                                                            >
+                                                                                <!-- <option value="all" selected>Select All</option> -->
+                                                                                {% for col in categorical_features %}
+                                                                                <option value="{{ col }}">
+                                                                                    {{ col }}
+                                                                                </option>
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div>
+                                                                        <br />
+
+                                                                        <label for="to_replace"
+                                                                            >Please enter the value you want to replace:
+                                                                        </label>
+                                                                        <input
+                                                                            type="text"
+                                                                            id="to_replace"
+                                                                            name="to_replace"
+                                                                            class="form-control"
+                                                                        /><br /><br />
+
+                                                                        <label for="value"
+                                                                            >Please enter the value you want to replace
+                                                                            with:
+                                                                        </label>
+                                                                        <input
+                                                                            type="text"
+                                                                            id="value"
+                                                                            name="value"
+                                                                            class="form-control"
+                                                                        /><br /><br />
+                                                                        <button
+                                                                            type="submit"
+                                                                            name="transformer"
+                                                                            form="replaceValueForm"
+                                                                            value="replaceValue"
+                                                                            class="btn btn-primary btn-sm"
+                                                                        >
+                                                                            Transform
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                    class="tab-pane fade"
+                                    id="tabs-icons-text-3"
+                                    role="tabpanel"
+                                    aria-labelledby="tabs-icons-text-3-tab"
+                                >
+                                    <div class="card-body">
+                                        <div class="row mb-1 pb-1">
+                                            <div class="col-lg-4">
+                                                <div
+                                                    class="card h-100 bg-primary"
+                                                    style="border-radius: 25px; height: 5px"
+                                                    title=""
+                                                >
+                                                    <div class="card-body pb-1 pt-3">
+                                                        <h5 class="h3 text-secondary text-uppercase">
+                                                            Manual Outlier Remover
+                                                        </h5>
+                                                        <p class="text-secondary">
+                                                            <small>
+                                                                Removes values outside of user specified range
+                                                            </small>
+                                                        </p>
+                                                        <button
+                                                            class="btn btn-sm btn-secondary"
+                                                            data-toggle="modal"
+                                                            data-target="#exampleModal5"
+                                                            data-placement="bottom"
+                                                        >
+                                                            Apply
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Modal -->
+                                            <div
+                                                class="modal fade"
+                                                id="exampleModal5"
+                                                tabindex="-1"
+                                                role="dialog"
+                                                aria-labelledby="exampleModalLabel"
+                                                aria-hidden="true"
+                                            >
+                                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLabel">
+                                                                Arbitrary Outlier Capper
+                                                            </h5>
+                                                            <button
+                                                                type="button"
+                                                                class="close"
+                                                                data-dismiss="modal"
+                                                                aria-label="Close"
+                                                            >
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="card bg-secondary border-0 mb-0">
+                                                                <div class="card-body px-lg-5 py-lg-5">
+                                                                    <form
+                                                                        method="post"
+                                                                        enctype="multipart/form-data"
+                                                                        id="capperForm"
+                                                                    >
+                                                                        {% csrf_token %}
+                                                                        <div id="manualSelectCol">
+                                                                            <h6 style="font-size: 1.1rem">
+                                                                                Select column
+                                                                            </h6>
+
+                                                                            <select
+                                                                                data-placeholder="Choose column"
+                                                                                class="select form-control chosen-select"
+                                                                                name="capColumn"
+                                                                                id="capColumn"
+                                                                            >
+                                                                                {% for col in numerical_features %}
+                                                                                <option value="{{ col }}">
+                                                                                    {{ col }}
+                                                                                </option>
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div>
+
+                                                                        <label for="capRight"
+                                                                            >Please enter the maximum value:</label
+                                                                        >
+                                                                        <input
+                                                                            type="number"
+                                                                            step="0.01"
+                                                                            id="capRight"
+                                                                            name="capRight"
+                                                                            class="form-control"
+                                                                        /><br /><br />
+
+                                                                        <label for="capLeft"
+                                                                            >Please enter the minimum value:</label
+                                                                        >
+                                                                        <input
+                                                                            type="number"
+                                                                            step="0.01"
+                                                                            id="capLeft"
+                                                                            name="capLeft"
+                                                                            class="form-control"
+                                                                        /><br /><br />
+
+                                                                        <br />
+                                                                        <button
+                                                                            type="submit"
+                                                                            name="transformer"
+                                                                            form="capperForm"
+                                                                            value="arbitraryOutlierCapper"
+                                                                            class="btn btn-primary btn-sm"
+                                                                        >
+                                                                            Transform
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Button trigger modal -->
+                                            <div class="col-lg-4">
+                                                <div
+                                                    class="card h-100 bg-primary"
+                                                    style="border-radius: 25px; height: 5px"
+                                                    title=""
+                                                >
+                                                    <div class="card-body pb-1 pt-3">
+                                                        <h5 class="h3 text-secondary text-uppercase">
+                                                            Automated Outlier remover
+                                                        </h5>
+                                                        <p class="text-secondary">
+                                                            <small
+                                                                >Removes values based on automated outliers
+                                                                calculation</small
+                                                            >
+                                                        </p>
+                                                        <button
+                                                            class="btn btn-sm btn-secondary"
+                                                            data-toggle="modal"
+                                                            data-target="#exampleModal6"
+                                                            data-placement="bottom"
+                                                        >
+                                                            Apply
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Modal -->
+                                            <div
+                                                class="modal fade"
+                                                id="exampleModal6"
+                                                tabindex="-1"
+                                                role="dialog"
+                                                aria-labelledby="exampleModalLabel"
+                                                aria-hidden="true"
+                                            >
+                                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLabel">
+                                                                Outlier Trimmer
+                                                            </h5>
+                                                            <button
+                                                                type="button"
+                                                                class="close"
+                                                                data-dismiss="modal"
+                                                                aria-label="Close"
+                                                            >
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="card bg-secondary border-0 mb-0">
+                                                                <div class="card-body px-lg-5 py-lg-5">
+                                                                    <form
+                                                                        method="post"
+                                                                        enctype="multipart/form-data"
+                                                                        id="outlierTrimmerForm"
+                                                                    >
+                                                                        {% csrf_token %}
+                                                                        <label for="tail"
+                                                                            >Choose whether to cap outliers on the
+                                                                            right, left or both tails of the
+                                                                            distribution:</label
+                                                                        >
+                                                                        <select
+                                                                            name="tail"
+                                                                            id="tail"
+                                                                            class="form-control"
+                                                                        >
+                                                                            <option value="both">Both</option>
+                                                                            <option value="right">Right</option>
+                                                                            <option value="left">Left</option></select
+                                                                        ><br /><br /><br />
+                                                                        <button
+                                                                            type="submit"
+                                                                            name="transformer"
+                                                                            form="outlierTrimmerForm"
+                                                                            value="outlierTrimmer"
+                                                                            class="btn btn-primary btn-sm"
+                                                                        >
+                                                                            Transform
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% comment %} end {% endcomment %}
+                   
+                    {% comment %}
+                    <h2 style="padding-bottom: 20px">Select the transformer you want to use and then click Next</h2>
+                    {% endcomment %}
+
+                    
+
+                    <div class="card">
+                        <div class="card-body" >
+                            <h2 class="card-title">Data Preview</h2>
+                            <div style="width:100%; overflow:auto;">
+                                <div>{{sample_table | safe}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="card-title">Transformers Applied</h2>
+                            <div style="width:100%; overflow:auto;">
+                                <div>{{ tables |safe }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-12">
+                                <div class="row">
+                                    <div class="col-lg-4"></div>
+                                    <div class="col-lg-4">
+                                        <!-- <div class="card card-lift--hover  h-100 bg-white" style="border-radius:25px; width:120%"> -->
+                                        <div class="card-body py-5">
+                                            <form method="post" enctype="multipart/form-data" id="next">
+                                                {% csrf_token %}
+                                                <div id="submitBtnLoaderParent">
+                                                    <button
+                                                        type="submit"
+                                                        class="btn btn-primary btn-lg btn-block"
+                                                        name="next"
+                                                        form="next"
+                                                        value="next"
+                                                        id="submitBtnLoader"
+                                                    >
+                                                        Next
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <!-- </div> -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE -->
+{% block javascripts %}
+<script>
+    const uploadBtn = document.getElementById("uploadBtn")
+    uploadBtn.addEventListener('click', () => {
+        console.log("Pene")
+        const file = document.getElementById("file")
+        console.log(file.files[0].name)
+    })
+</script>
+
+
+<script src="/static/assets/vendor/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+
+<script>
+    $("#my_table").DataTable({
+        pageLength: 5,
+        "ordering": false,
+        language: {
+            "paginate": {
+              "previous": "<<",
+              "next":">>"
+            }
+          }
+    });
+</script>
+
+<script>
+    $("#sample_table").DataTable({
+        pageLength: 5,
+        language: {
+            "paginate": {
+              "previous": "<<",
+              "next":">>"
+            }
+          }
+    });
+</script>
+
+<script>
+    $("#submitBtnLoader").on("click", function () {
+        showLoader();
+    });
+
+    function showLoader() {
+        $("#submitBtnLoader").hide();
+        // $('#submitBtnLoaderParent').append('<div style="" id="loadingDiv"><div class="loader">Loading...</div></div>');
+        $("#submitBtnLoaderParent").append(
+            '<button type="submit" class="btn btn-primary btn-lg btn-block" name="next" form="next" value="next" id="submitBtnLoader" disabled><span class="spinner"></span>Loading...</button>'
+        );
+        // console.log('Came here')
+    }
+</script>
+
+<script>
+    function yesnoCheck(that) {
+        if (that.value == "constant") {
+            document.getElementById("ifYes").style.display = "block";
+        } else {
+            document.getElementById("ifYes").style.display = "none";
+        }
+    }
+</script>
+
+{% endblock javascripts %}
