@@ -54,11 +54,17 @@ def dataCleaning(request):
     if(request.method == 'POST'):
         form = UploadFileForm(request.POST, request.FILES)
         file = request.FILES['file']
+        
+        # Can do validation and data cleaning here 
+        # I.e check if the file is a csv file (or any other acceptable file type)
+        # Then do the data cleaning on the file
 
+
+        # Saves the file to the database (Probably optional)
         File.objects.create(file=file) 
 
 
-        return HttpResponseRedirect(reverse('dataCleaning'), {} )
+        return HttpResponseRedirect(reverse('dataCleaning'), {'form': form} )
     else:
         form = UploadFileForm()
         
