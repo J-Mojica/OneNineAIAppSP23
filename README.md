@@ -7,7 +7,7 @@ and it'll launch a local django server on port 8000. For now most of our work wi
 ## Argon dashboard quick set up
 ```
 git clone  https://github.com/J-Mojica/OneNineAIAppSP23.git
-cd argon-dashboard-django
+cd OneNineAIAppSP23/argon-dashboard-django/
 
 # Virtualenv modules installation (Unix based systems)
 virtualenv env
