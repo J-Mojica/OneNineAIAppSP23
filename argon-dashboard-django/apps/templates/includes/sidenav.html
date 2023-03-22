@@ -24,6 +24,12 @@
             </a>
           </li>
           <li class="nav-item">
+            <a class="nav-link {% if 'Monitoring' in segment %} active {% endif %}" href="{% url 'modelMonitoring' %}">
+              <i class="ni ni-bulb-61 text-orange"></i>
+              <span class="nav-link-text">Model Monitoring</span>
+            </a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link {% if 'icons' in segment %} active {% endif %}" href="/icons.html">
               <i class="ni ni-planet text-orange"></i>
               <span class="nav-link-text">Icons</span>
