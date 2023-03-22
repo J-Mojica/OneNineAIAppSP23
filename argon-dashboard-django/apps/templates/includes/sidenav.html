@@ -17,18 +17,42 @@
               <span class="nav-link-text">Dashboard</span>
             </a>
           </li>
+        <!-- Create New Model nav item -->
           <li class="nav-item">
-            <a class="nav-link {% if 'dataCleaning' in segment %} active {% endif %}" href="{% url 'dataCleaning' %}">
+            <a class="nav-link {% if 'create' in segment %} active {% endif %}" href="{% url 'createModel' %}">
+              <i class="ni ni-atom text-info"></i>
+              <span class="nav-link-text">Create New AI Model</span>
+            </a>
+          </li>
+        <!-- Data Clening nav item -->
+          <li class="nav-item">
+            <a class="nav-link {% if 'cleaning' in segment %} active {% endif %}" href="{% url 'dataCleaning' %}">
               <i class="ni ni-folder-17 text-orange"></i>
               <span class="nav-link-text">Data Cleaning</span>
             </a>
           </li>
+        <!-- Model Monitoring nav item -->
           <li class="nav-item">
-            <a class="nav-link {% if 'Monitoring' in segment %} active {% endif %}" href="{% url 'modelMonitoring' %}">
-              <i class="ni ni-bulb-61 text-orange"></i>
+            <a class="nav-link {% if 'monitoring' in segment %} active {% endif %}" href="{% url 'modelMonitoring' %}">
+              <i class="ni ni-sound-wave text-yellow"></i>
               <span class="nav-link-text">Model Monitoring</span>
             </a>
           </li>
+        <!-- Model Retraining nav item -->
+          <li class="nav-item">
+            <a class="nav-link {% if 'retraining' in segment %} active {% endif %}" href="{% url 'modelReTraining' %}">
+              <i class="ni ni-spaceship text-default"></i>
+              <span class="nav-link-text">Model Retraining</span>
+            </a>
+          <!-- Use Cases nav item -->
+            <li class="nav-item">
+              <a class="nav-link {% if 'useCases' in segment %} active {% endif %}" href="{% url 'useCases' %}">
+                <i class="ni ni-bulb-61 text-primary"></i>
+                <span class="nav-link-text">Use Cases</span>
+              </a>
+            </li>
+          </li>
+          <!-- Template nav items -->
           <li class="nav-item">
             <a class="nav-link {% if 'icons' in segment %} active {% endif %}" href="/icons.html">
               <i class="ni ni-planet text-orange"></i>

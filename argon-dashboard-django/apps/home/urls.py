@@ -10,9 +10,11 @@ urlpatterns = [
 
     # The home page
     path('', views.index, name='home'),
-
-    path('dataCleaning/', views.dataCleaning, name='dataCleaning'),
-    path('modelMonitoring/', views.modelMonitoring, name='modelMonitoring'),
+    path('create/', views.createModel, name='createModel'),
+    path('cleaning/', views.dataCleaning, name='dataCleaning'),
+    path('monitoring/', views.modelMonitoring, name='modelMonitoring'),
+    path('retraining/', views.modelReTraining, name='modelReTraining'),
+    path('useCases/', views.useCases, name='useCases'),
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
 
