@@ -69,14 +69,14 @@ def dataCleaning(request):
         form = UploadFileForm()
         
         
-    #context = {'segment': 'dataUpload'}
+    context = {'segment': 'dataCleaning', 'form': form}
     #html_template = loader.get_template('home/dataUpload.html')
-    return render(request, 'home/cleaning.html', {'form': form})
+    return render(request, 'home/cleaning.html', context)
 
 @login_required(login_url="/login/")
 def modelMonitoring(request):
     # HERE GOES MLFLOW
     #model = sklearn.linear_model.LogisticRegression()
     #context = {'model': model}
-    context = {}
+    context = {'segment': 'modelMonitoring'}
     return render(request, 'home/modelMonitoring.html', context)
