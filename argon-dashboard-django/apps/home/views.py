@@ -12,6 +12,7 @@ from django.shortcuts import render
 
 from .forms import UploadFileForm
 from .models import *
+from .cleaning  import *
 
 
 @login_required(login_url="/login/")
@@ -91,7 +92,7 @@ def modelReTraining(request):
 @login_required(login_url="/login/")
 def useCases(request):
     # HERE GOES USE CASES
-
+    
     context = {'segment': 'useCases'}
     return render(request, 'home/useCases.html', context)
 

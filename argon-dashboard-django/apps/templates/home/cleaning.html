@@ -1054,7 +1054,7 @@
                                     <div class="col-lg-4">
                                         <!-- <div class="card card-lift--hover  h-100 bg-white" style="border-radius:25px; width:120%"> -->
                                         <div class="card-body py-5">
-                                            <form method="post" enctype="multipart/form-data" id="next">
+                                            <form action="{% url 'modelMonitoring' %}" method="post" enctype="multipart/form-data" id="next">
                                                 {% csrf_token %}
                                                 <div id="submitBtnLoaderParent">
                                                     <button
