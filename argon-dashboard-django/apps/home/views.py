@@ -60,7 +60,7 @@ def dataCleaning(request):
         # I.e check if the file is a csv file (or any other acceptable file type)
         # Then do the data cleaning on the file
 
-
+        clean1(file)
         # Saves the file to the database (Probably optional)
         File.objects.create(file=file) 
 
@@ -92,7 +92,7 @@ def modelReTraining(request):
 @login_required(login_url="/login/")
 def useCases(request):
     # HERE GOES USE CASES
-    
+
     context = {'segment': 'useCases'}
     return render(request, 'home/useCases.html', context)
 
