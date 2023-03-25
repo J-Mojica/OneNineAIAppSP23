@@ -9,11 +9,14 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
 from django.shortcuts import render
-
+from django.http import HttpResponse
+from django.core.files.storage import FileSystemStorage
+import pandas as pd
+import json as json
+import numpy as np
 from .forms import UploadFileForm
 from .models import *
-from .cleaning  import *
-
+from .datacleanup import *
 
 @login_required(login_url="/login/")
 def index(request):
@@ -53,26 +56,11 @@ def pages(request):
 @login_required(login_url="/login/")
 def dataCleaning(request):
     if(request.method == 'POST'):
-        form = UploadFileForm(request.POST, request.FILES)
-        file = request.FILES['file']
-        
-        # Can do validation and data cleaning here 
-        # I.e check if the file is a csv file (or any other acceptable file type)
-        # Then do the data cleaning on the file
-
-        clean1(file)
-        # Saves the file to the database (Probably optional)
-        File.objects.create(file=file) 
-
-
-        return HttpResponseRedirect(reverse('dataCleaning'), {'form': form} )
-    else:
-        form = UploadFileForm()
-        
-        
-    context = {'segment': 'cleaning', 'form': form}
-    #html_template = loader.get_template('home/dataUpload.html')
-    return render(request, 'home/cleaning.html', context)
+        if request.POST['method'] =='impute':
+            return impute(request)
+        if request.POST['method'] == 'dropFeature':
+            return dropFeature(request)
+    return render(request, 'home/cleaning.html')
 
 @login_required(login_url="/login/")
 def modelMonitoring(request):
@@ -102,3 +90,15 @@ def createModel(request):
 
     context = {'segment': 'create'}
     return render(request, 'home/create.html', context)
+
+# Create your views here.
+def upload(request):
+    file = request.FILES['fileUpload']
+    fs=FileSystemStorage()
+    #print("Working!")
+    fs.save('./users/'+request.user.username+'/'+file.name,file) #saved into datasets folder
+    # if we have enough time we could make a user based folder system like AFS
+    #with open('diabetes.csv', 'wb+') as destination:
+    #    for chunk in file.chunks():
+    #        destination.write(chunk)
+    return HttpResponse("Works!") #Just sending something that's ignored by jquery

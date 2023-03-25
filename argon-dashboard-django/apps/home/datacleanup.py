@@ -1,23 +1,18 @@
+from django import template
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse, HttpResponseRedirect
+from django.template import loader
+from django.urls import reverse
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.core.files.storage import FileSystemStorage
 import pandas as pd
 import json as json
 import numpy as np
-# Create your views here.
-def home(request):
-    return render(request, 'transform/home.html')
-def upload(request):
-    file = request.FILES['fileUpload']
-    fs=FileSystemStorage()
-    fs.save('datasets/'+file.name,file) #saved into datasets folder
-    # if we have enough time we could make a user based folder system like AFS
-    #with open('diabetes.csv', 'wb+') as destination:
-    #    for chunk in file.chunks():
-    #        destination.write(chunk)
-    return HttpResponse("Works!") #Just sending something that's ignored by jquery
+#Any datacleanup stuff goes here: (Pass in the raw request from the view)
 def impute(request):
-    df=pd.read_csv("datasets/"+request.POST['fileName'],skipinitialspace=True) #Turns all blank cells into NaN
+
+    df=pd.read_csv('./users/'+request.user.username+'/'+request.POST['fileName'],skipinitialspace=True) #Turns all blank cells into NaN
     if(request.POST['feature1']=='All'):
         if(request.POST['imputeZero']=='Yes'): #Replace zeroes with NaNs for all if Yes
             df.replace(0,np.NaN,inplace=True)
@@ -50,13 +45,15 @@ def impute(request):
                 df[request.POST['feature1']].replace(np.NaN,df[request.POST['feature1']].mean(),inplace=True)
             except:
                 df = df.fillna(df[request.POST['feature1']].value_counts().index[0])
-    df.to_csv('datasets/'+request.POST['fileName'],index=False)
-    return HttpResponse(df.to_html())
+    df.to_csv('./users/'+request.user.username+'/'+request.POST['fileName'],index=False)
+    return HttpResponse(df.to_html(classes='dataframe table table-striped table-bordered dataTable no-footer'))
+
 def dropFeature(request):
-    df=pd.read_csv("datasets/"+request.POST['fileName'],skipinitialspace=True)
-    df.drop(request.POST['fileName'], axis=1,inplace=True)
-    df.to_csv('datasets/'+request.POST['fileName'],index=False)
-    return HttpResponse(df.to_html(classes='table table-stripped'))
+    print(request.POST)
+    df=pd.read_csv('./users/'+request.user.username+'/'+request.POST['fileName'],skipinitialspace=True)
+    df.drop(request.POST['feature2'], axis=1,inplace=True)
+    df.to_csv('./users/'+request.user.username+'/'+request.POST['fileName'],index=False)
+    return HttpResponse(df.to_html(classes='dataframe table table-striped table-bordered dataTable no-footer'))
 #to bypass issues where we need to send multiple html things or html + other stuff
 #Maybe you could store a temp html file and then GET request it from frontend
 #Or you could append all wanted html things into one html file and parse through it in frontend

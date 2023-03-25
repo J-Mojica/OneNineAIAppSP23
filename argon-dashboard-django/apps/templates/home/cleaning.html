@@ -57,6 +57,11 @@
     .progressbar li.active + li:after {
         background-color: #55b776;
     }
+    table{
+   overflow-y:scroll;
+   height:500px;
+   display:inline-block;
+}
 </style>
 {% endblock stylesheets %} {% block content %}
 
@@ -67,7 +72,7 @@
             <li class="breadcrumb-item">
                 <a href="/"><i class="fas fa-home"></i></a>
             </li>
-            <li class="breadcrumb-item"><a href="/projects/createnew/">AI Project</a></li>
+            <li class="breadcrumb-item"><a href="/create/">AI Project</a></li>
             <li class="breadcrumb-item"><a href="#">{{ projectName }}</a></li>
             <li class="breadcrumb-item active" aria-current="page">Transform Data</li>
         </ol>
@@ -78,39 +83,22 @@
     <div class="row">
         <div class="col">
             <div class="card shadow">
-                <div class="card-header border-0">
-                    <div class="container">
-                        <ul class="progressbar">
-                            <li>Create Project</li>
-                            <li>Select Data</li>
-                            <li class="active">Transform Data</li>
-                            <li>Select Parameter</li>
-                            <li>See Results</li>
-                        </ul>
-                    </div>
-                </div>
+                
 
                 <div class="m-5" id="transformerGroup">
                     {% comment %} start {% endcomment %}
                     <!-- START UPLOAD DATA -->
-                    <form action= "{% url 'dataCleaning' %}" method="POST" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <div class="card">
-                            <div class="card-header">
-                                <h2 class="mb-0">Input Data</h2>
-                            </div>
-
-                            <div class="card-body">
-                                <p>
-                                {{ form.file }}
-                                </p>
-                            </div>
-                        </div>
-                        <div class="d-flex justify-content-center align-items-center p-3">
-                            <input type="submit" class="btn btn-primary" id="uploadBtn" value="Upload File"/>
-                        </div>
-                    </form> 
+                    <div class="card-header">
+                        <h2 class="mb-0">Input Data</h2>
+                    </div>
+                    <form id="datasetUpload" enctype="multipart/form-data" method="post"> {% csrf_token %}
+                        <input type="file" id="fileUpload" />
+                        <input type="submit" value="Upload" id="upload" />
+                    </form>
                     <!-- END UPLOAD DATA -->
+                    <div class="card" id="dvCSV">
+
+                    </div>
                     <div class="card">
                         <div class="card-header">
                             <h2 class="mb-0">Apply Transformers</h2>
@@ -229,32 +217,25 @@
                                                         <div class="modal-body">
                                                             <div class="card bg-secondary border-0 mb-0">
                                                                 <div class="card-body px-lg-5 py-lg-5">
-                                                                    <form
-                                                                        method="post"
-                                                                        enctype="multipart/form-data"
-                                                                        id="meanMedianForm"
-                                                                    >
-                                                                        {% csrf_token %}
-                                                                        <label for="method">Choose a method:</label>
-                                                                        <select
-                                                                            name="method"
-                                                                            id="method"
-                                                                            class="form-control"
-                                                                        >
-                                                                            <option value="mean">Mean</option>
-                                                                            <option value="median">Median</option>
+                                                                    <form id="Impute" class="features" enctype="multipart/form-data" method="post"> {% csrf_token %}
+                                                                        <input type="hidden" name="method" value="impute">
+                                                                        Select Which Feature to Impute:
+                                                                        <select name="feature1" id="feature1">
+                                                                            <option value="All" selected>All</option>
                                                                         </select>
-
-                                                                        <br /><br />
-                                                                        <button
-                                                                            type="submit"
-                                                                            name="transformer"
-                                                                            form="meanMedianForm"
-                                                                            value="meanMedian"
-                                                                            class="btn btn-primary btn-sm"
-                                                                        >
-                                                                            Transform
-                                                                        </button>
+                                                                        Are zeroes in the selected columns missing values in your dataset(Should we impute zeroes?)
+                                                                        <select name="imputeZero" id="imputeZero">
+                                                                            <option value="No" selected>No</option>
+                                                                            <option value="Yes">Yes</option>
+                                                                        </select>
+                                                                        Pick Imputation Method:
+                                                                        <select name="imputeMethod" id="imputeMethod">
+                                                                                <option value="Median">Median</option>
+                                                                                <option value="Mean">Mean</option>
+                                                                        </select>
+                                                                        <input type="submit" value="Transform" class="btn btn-primary btn-sm"  />
+                                                    
+                                                                    
                                                                     </form>
                                                                 </div>
                                                             </div>
@@ -540,42 +521,13 @@
                                                         <div class="modal-body">
                                                             <div class="card bg-secondary border-0 mb-0">
                                                                 <div class="card-body px-lg-5 py-lg-5">
-                                                                    <form
-                                                                        method="post"
-                                                                        enctype="multipart/form-data"
-                                                                        id="dropFeaturesForm"
-                                                                    >
-                                                                        {% csrf_token %}
-                                                                        <div id="manualSelectCol">
-                                                                            <h6 style="font-size: 1.1rem">
-                                                                                Select columns to drop
-                                                                            </h6>
-
-                                                                            <select
-                                                                                data-placeholder="Choose columns to drop"
-                                                                                class="select form-control chosen-select"
-                                                                                multiple
-                                                                                name="dropColumns"
-                                                                                id="dropColumns"
-                                                                            >
-                                                                                {% for col in columns %}
-                                                                                <option value="{{ col }}">
-                                                                                    {{ col }}
-                                                                                </option>
-                                                                                {% endfor %}
-                                                                            </select>
-                                                                        </div>
-
-                                                                        <br />
-                                                                        <button
-                                                                            type="submit"
-                                                                            name="transformer"
-                                                                            form="dropFeaturesForm"
-                                                                            value="dropFeatures"
-                                                                            class="btn btn-primary btn-sm"
-                                                                        >
-                                                                            Transform
-                                                                        </button>
+                                                                    <form id="DropFeature" class="features" enctype="multipart/form-data" method="post"> {% csrf_token %}
+                                                                        Select Which feature to drop:
+                                                                        <input type="hidden" name="method" value="dropFeature">
+                                                                        <select name="feature2" id="feature2">
+                                                                            
+                                                                        </select>
+                                                                        <input type="submit" value="Transform" class="btn btn-primary btn-sm"  />
                                                                     </form>
                                                                 </div>
                                                             </div>
@@ -1148,4 +1100,173 @@
     }
 </script>
 
+<script type="text/javascript">
+    let fileName='';
+    let Columns=[];
+    const featuresImplemented=2;
+    $(function () 
+    {
+        function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+        }
+        var csrftoken = getCookie('csrftoken');
+        //Upload dataset to backend
+        $("#upload").bind("click", function () 
+        {
+            var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.csv|.txt)$/;
+            if (regex.test($("#fileUpload").val().toLowerCase())) 
+            {
+                if (typeof (FileReader) != "undefined") 
+                {
+                    var reader = new FileReader();
+                    reader.onload = function (e) 
+                    {
+                        var table = $("<table class='dataframe table table-striped table-bordered dataTable no-footer'>");
+                        var rows = e.target.result.split("\r\n"); //Might need to update this since linebreaks can be \r\n;
+                        for (var i = 0; i < rows.length; i++) 
+                        {
+                            var row = $("<tr />");
+                            var cells = rows[i].split(",");
+                            if (cells.length > 1) {
+                                for (var j = 0; j < cells.length; j++) 
+                                {
+                                    var cell = $("<td />");
+                                    cell.html(cells[j]);
+                                    if(i==0) //Grabs the variable names;
+                                        Columns.push(cells[j]);
+                                    row.append(cell);
+                                }
+                                table.append(row);
+                            }
+                        }
+                        $("#dvCSV").html('');
+                        $("#dvCSV").append(table);
+                        for(let i=1;i<=featuresImplemented;i++) //Currently have 2 features implemented.
+                        {
+                            var select = document.getElementById("feature"+i);
+                            
+                            for(index in Columns) 
+                            {
+                
+                                select.options[select.options.length] = new Option(Columns[index], Columns[index]);
+                            }
+                 
+                        }
+                    }
+                    reader.readAsText($("#fileUpload")[0].files[0]);
+                    fileName=$("#fileUpload")[0].files[0].name;
+                    //const blob = new Blob([$("#fileUpload")[0].files[0]], { type: 'text/csv' });
+                    
+                } 
+                else 
+                {
+                    alert("This browser does not support HTML5.");
+                }
+            } 
+            else 
+            {
+                alert("Please upload a valid CSV file.");
+            }
+        });
+        //Show dataset on upload.
+        $("#datasetUpload").submit(function (event) 
+        {
+            
+            var fd = new FormData();
+            fd.append('csrfmiddlewaretoken',csrftoken);
+            fd.append('fileUpload', $("#fileUpload")[0].files[0]);
+            $.ajax({
+            type: "POST",
+            url: "upload",
+            data: fd,
+            contentType: false,
+            processData: false,
+            enctype: 'multipart/form-data'
+            }).done(function (data) {
+            console.log(fd);
+            });
+
+            event.preventDefault();
+        });
+        $("#Impute").submit(function(event)
+        {
+            var fd = new FormData(document.querySelector('#Impute'))
+            fd.append('fileName',fileName);
+            console.log(fd);
+
+            //console.log(document.querySelector('#Impute'))
+            $.ajax({
+            type: "POST",
+            url: "",
+            data: fd,
+            contentType: false,
+            processData: false,
+            enctype: 'multipart/form-data'
+            }).done(function (data) {
+                $("#dvCSV").html('');
+                $("#dvCSV").append(data);
+                console.log(fd);
+            }); 
+            event.preventDefault();
+        });
+
+        $("#DropFeature").submit(function(event)
+        {
+            var fd = new FormData(document.querySelector('#DropFeature'))
+            fd.append('fileName',fileName);
+            console.log(fd);
+            for(i=1;i<=featuresImplemented;i++)
+            {
+                $('#feature'+i+' option[value=\''+fd.get("feature2")+'\'] ').remove();
+            }
+            event.preventDefault();
+            //console.log(document.querySelector('#Impute'))
+
+            $.ajax({
+            type: "POST",
+            url: "",
+            data: fd,
+            contentType: false,
+            processData: false,
+            enctype: 'multipart/form-data'
+            }).done(function (data) {
+                $("#dvCSV").html('');
+                $("#dvCSV").append(data);
+            }); 
+            event.preventDefault();
+
+        });
+
+        //Apply transmations:
+        $("#MeanMedianImpute").click(function()
+        {
+            if ( $('#Impute').css('visibility') == 'hidden' )
+                $('#Impute').css('visibility','visible');
+            else
+                $('#Impute').css('visibility','hidden');
+        });
+
+        $("#removeFeature").click(function()
+        {
+            if ( $('#DropFeature').css('visibility') == 'hidden' )
+                $('#DropFeature').css('visibility','visible');
+            else
+                $('#DropFeature').css('visibility','hidden');
+        });
+
+    });
+
+</script>
 {% endblock javascripts %}

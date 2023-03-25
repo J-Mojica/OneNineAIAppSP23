@@ -1,18 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
-
+<!-- An idea for later:Make form inputs into readonly and select options into disable after some form submissions -->
+<!--Do this so the user can look back at previous steps (such as creating a project) without giving them the ability to change certain things-->
 <head>
 <style>
-table  { margin-top:  20px; display: inline-block; overflow: auto; }
+table  { margin-top:  20px; display: inline-block; overflow: auto; height: 150px;}
 th div { margin-top: -20px; position: absolute; }
+.features 
+{
+    visibility: hidden
+}
 </style>
 
 </head>
 
 <body>
   
+<form id="datasetUpload" enctype="multipart/form-data" method="post"> {% csrf_token %}
+    <input type="file" id="fileUpload" />
+    <input type="submit" value="Upload" id="upload" />
+</form>
+
+
+<!-- Bind into showing a form for each button -->
+<div id="dvCSV">
+</div>
+
+<!-- Bind into showing a form for each button -->
+<div id="Transformations">
+<button id=MeanMedianImpute>Missing Value Impute</button> <!-- Bind into showing a form for each button -->
+
+<!-- The Forms for each feature, they're named featureX to make it hopefully easier for jquery -->
+<form id="Impute" class="features" enctype="multipart/form-data" method="post"> {% csrf_token %}
+    Select Which Feature to Impute:
+    <select name="feature1" id="feature1">
+        <option value="All" selected>All</option>
+    </select>
+    Are zeroes in the selected columns missing values in your dataset(Should we impute zeroes?)
+    <select name="imputeZero" id="imputeZero">
+        <option value="No" selected>No</option>
+        <option value="Yes">Yes</option>
+    </select>
+    Pick Imputation Method:
+    <select name="imputeMethod" id="imputeMethod">
+            <option value="Median">Median</option>
+            <option value="Mean">Mean</option>
+    </select>
+    <input type="submit" value="Upload"  />
+
+</form>
+
+<button id="removeFeature">Feature Remover</button> <!-- Bind into showing a form for each button -->
+<form id="DropFeature" class="features" enctype="multipart/form-data" method="post"> {% csrf_token %}
+    Select Which feature to drop:
+    <select name="feature2" id="feature2">
+        
+    </select>
+    <input type="submit" value="Upload" />
+</form>
+
+
+</div>
+
+<div id="DataAnalysisReport">
+</div>
+
+<!-- Maybe will be used to select what parameter we want to predict -->
+<div id="SelectParameters">
+
+</div>
+<!-- Report results -->
+<div id="ResultReport">
+
+</div>
+
+</body>
+
+
+<!--Put scripts here for ordering sake.-->
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 <script type="text/javascript">
+    let fileName='';
+    let Columns=[];
+    const featuresImplemented=2;
     $(function () 
     {
         function getCookie(name) {
@@ -31,6 +101,7 @@ th div { margin-top: -20px; position: absolute; }
         return cookieValue;
         }
         var csrftoken = getCookie('csrftoken');
+        //Upload dataset to backend
         $("#upload").bind("click", function () 
         {
             var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.csv|.txt)$/;
@@ -41,8 +112,8 @@ th div { margin-top: -20px; position: absolute; }
                     var reader = new FileReader();
                     reader.onload = function (e) 
                     {
-                        var table = $("<table style='height: 150px'/>");
-                        var rows = e.target.result.split("\n");
+                        var table = $("<table border='1'>");
+                        var rows = e.target.result.split("\r\n"); //Might need to update this since linebreaks can be \r\n;
                         for (var i = 0; i < rows.length; i++) 
                         {
                             var row = $("<tr />");
@@ -52,6 +123,8 @@ th div { margin-top: -20px; position: absolute; }
                                 {
                                     var cell = $("<td />");
                                     cell.html(cells[j]);
+                                    if(i==0) //Grabs the variable names;
+                                        Columns.push(cells[j]);
                                     row.append(cell);
                                 }
                                 table.append(row);
@@ -59,9 +132,21 @@ th div { margin-top: -20px; position: absolute; }
                         }
                         $("#dvCSV").html('');
                         $("#dvCSV").append(table);
+                        for(let i=1;i<=featuresImplemented;i++) //Currently have 2 features implemented.
+                        {
+                            var select = document.getElementById("feature"+i);
+                            
+                            for(index in Columns) 
+                            {
+                
+                                select.options[select.options.length] = new Option(Columns[index], Columns[index]);
+                            }
+                 
+                        }
                     }
                     reader.readAsText($("#fileUpload")[0].files[0]);
-                    const blob = new Blob([$("#fileUpload")[0].files[0]], { type: 'text/csv' });
+                    fileName=$("#fileUpload")[0].files[0].name;
+                    //const blob = new Blob([$("#fileUpload")[0].files[0]], { type: 'text/csv' });
                     
                 } 
                 else 
@@ -74,7 +159,8 @@ th div { margin-top: -20px; position: absolute; }
                 alert("Please upload a valid CSV file.");
             }
         });
-        $("form").submit(function (event) 
+        //Show dataset on upload.
+        $("#datasetUpload").submit(function (event) 
         {
             
             var fd = new FormData();
@@ -93,22 +179,75 @@ th div { margin-top: -20px; position: absolute; }
 
             event.preventDefault();
         });
+        $("#Impute").submit(function(event)
+        {
+            var fd = new FormData(document.querySelector('#Impute'))
+            fd.append('fileName',fileName);
+            console.log(fd);
+
+            //console.log(document.querySelector('#Impute'))
+            $.ajax({
+            type: "POST",
+            url: "impute",
+            data: fd,
+            contentType: false,
+            processData: false,
+            enctype: 'multipart/form-data'
+            }).done(function (data) {
+                $("#dvCSV").html('');
+                $("#dvCSV").append(data);
+                $('#Impute').css("visibility", "hidden")
+            }); 
+            event.preventDefault();
+        });
+
+        $("#DropFeature").submit(function(event)
+        {
+            var fd = new FormData(document.querySelector('#DropFeature'))
+            fd.append('fileName',fileName);
+            console.log(fd);
+            for(i=1;i<=featuresImplemented;i++)
+            {
+                $('#feature'+i+' option[value=\''+fd.get("feature2")+'\'] ').remove();
+            }
+            event.preventDefault();
+            //console.log(document.querySelector('#Impute'))
+
+            $.ajax({
+            type: "POST",
+            url: "dropFeature", //code this later.
+            data: fd,
+            contentType: false,
+            processData: false,
+            enctype: 'multipart/form-data'
+            }).done(function (data) {
+                $("#dvCSV").html('');
+                $("#dvCSV").append(data);
+                $('#DropFeature').css("visibility", "hidden") //Need to remove the removed feature from all selectors.
+            }); 
+            event.preventDefault();
+
+        });
+
+        //Apply transmations:
+        $("#MeanMedianImpute").click(function()
+        {
+            if ( $('#Impute').css('visibility') == 'hidden' )
+                $('#Impute').css('visibility','visible');
+            else
+                $('#Impute').css('visibility','hidden');
+        });
+
+        $("#removeFeature").click(function()
+        {
+            if ( $('#DropFeature').css('visibility') == 'hidden' )
+                $('#DropFeature').css('visibility','visible');
+            else
+                $('#DropFeature').css('visibility','hidden');
+        });
+
     });
 
-    
-    
-    
 </script>
-<form enctype="multipart/form-data" method="post"> {% csrf_token %}
-    <input type="file" id="fileUpload" />
-    <input type="submit" value="Upload" id="upload" />
-</form>
-
-<hr />
-<div id="dvCSV">
-</div>
-
-</body>
-
 </html>
 
