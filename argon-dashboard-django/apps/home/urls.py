@@ -14,6 +14,7 @@ urlpatterns = [
     path('cleaning/', views.dataCleaning, name='dataCleaning'),
     path('monitoring/', views.modelMonitoring, name='modelMonitoring'),
     path('retraining/', views.modelReTraining, name='modelReTraining'),
+    path('errorAnalysis/', views.errorAnalysis, name='errorAnalysis'),
     path('useCases/', views.useCases, name='useCases'),
     path('cleaning/upload',views.upload,name='upload'),
     #path('cleaning/impute',views.impute,name='impute'),

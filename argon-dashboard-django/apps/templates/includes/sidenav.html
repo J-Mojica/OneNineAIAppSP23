@@ -44,6 +44,12 @@
               <i class="ni ni-spaceship text-default"></i>
               <span class="nav-link-text">Model Retraining</span>
             </a>
+        <!-- Error Analysis nav item -->
+          <li class="nav-item">
+            <a class="nav-link {% if 'erroranalysis' in segment %} active {% endif %}" href="{% url 'errorAnalysis' %}">
+              <i class="ni ni-spaceship text-default"></i>
+              <span class="nav-link-text">Error Analysis</span>
+            </a>
           <!-- Use Cases nav item -->
             <li class="nav-item">
               <a class="nav-link {% if 'useCases' in segment %} active {% endif %}" href="{% url 'useCases' %}">

@@ -80,6 +80,11 @@ def modelReTraining(request):
     return render(request, 'home/retraining.html', context)
 
 @login_required(login_url="/login/")
+def errorAnalysis(request):
+    context = {'segment': 'errorAnalysis'}
+    return render(request, 'home/errorAnalysis.html', context)
+
+@login_required(login_url="/login/")
 def useCases(request):
     # HERE GOES USE CASES
 
