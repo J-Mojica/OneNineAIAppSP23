@@ -17,6 +17,7 @@ urlpatterns = [
     path('errorAnalysis/', views.errorAnalysis, name='errorAnalysis'),
     path('useCases/', views.useCases, name='useCases'),
     path('cleaning/upload',views.upload,name='upload'),
+    path('errorAnalysis/upload', views.upload, name='upload'),
     #path('cleaning/impute',views.impute,name='impute'),
     #path('cleaning/dropFeature',views.dropFeature,name='dropFeature'),
     # Matches any html file
