@@ -60,6 +60,8 @@ def dataCleaning(request):
             return impute(request)
         if request.POST['method'] == 'dropFeature':
             return dropFeature(request)
+        if request.POST['method'] == 'dropCorrelated':
+            return dropCorrelated(request)
     return render(request, 'home/cleaning.html')
 
 @login_required(login_url="/login/")
