@@ -98,10 +98,31 @@
                     <!-- END UPLOAD DATA -->
                     <div class="card" id="dvCSV">
 
+                    </div>						
+                    <div class="card">
+                        <div class="card-header" id="automatedCleanupHead" data-toggle="collapse" data-target="#collapseAutomatedCleanup" aria-expanded="false" aria-controls="collapseAutomatedCleanup">
+                            <h3 class="mb-0">Automated Cleanup</h3>
+                        </div>
+                        <div id="collapseAutomatedCleanup" class="collapse" >
+                            <div class="card-body">
+                                    <p class="card-text mb-2">
+                                        Transforming you dataset can be a hard task for beginners and people not Familiar with data science. 
+                                        This option allows you to apply a set of predetermined transformation that work well for a general case!
+                                    </p>
+                            
+                                <form id="autoClean" class="features" enctype="multipart/form-data" method="post"> {% csrf_token %}
+                                    <input type="hidden" name="method" value="autoClean">
+                                    Select the feature you want to predict (so that it doesn't get removed):
+                                    <select name="target" id="feature4">
+                                    </select>
+                                    <input type="submit" value="Transform" class="btn btn-primary btn-sm"  />
+                                </form>
+                            </div>
+                        </div>
                     </div>
                     <div class="card">
                         <div class="card-header">
-                            <h2 class="mb-0">Apply Transformers</h2>
+                            <h2 class="mb-0">Manual Cleanup</h2>
                         </div>
 
                         <div class="card-body">
@@ -985,9 +1006,22 @@
                                                         form="next"
                                                         id="submitBtnLoader"
                                                     >
-                                                        Next
+                                                        Retrain
                                                     </button>
                                                 </div>
+                                            </form>
+                                            <br>
+                                            <form action="{% url 'createModel' %}" method="get" enctype="multipart/form-data">
+                                                <input type="Hidden" id="datasetNameset" name="datasetName" >
+                                                    <button
+                                                        type="submit"
+                                                        class="btn btn-primary btn-lg btn-block"
+                                                        form="next"
+                                                        id="submitBtnLoader"
+                                                    >
+                                                        Create Model
+                                                    </button>
+                                                
                                             </form>
                                         </div>
                                         <!-- </div> -->
@@ -1070,7 +1104,7 @@
 <script type="text/javascript">
     let fileName='';
     let Columns=[];
-    const featuresImplemented=3;
+    const featuresImplemented=4;
     $(function () 
     {
         function getCookie(name) {
@@ -1241,6 +1275,28 @@
             event.preventDefault();
 
         });
+        $("#autoClean").submit(function(event)
+        {
+            var fd = new FormData(document.querySelector('#autoClean'))
+            fd.append('fileName',fileName);
+            console.log(fd);
+            event.preventDefault();
+            //console.log(document.querySelector('#Impute'))
+
+            $.ajax({
+            type: "POST",
+            url: "",
+            data: fd,
+            contentType: false,
+            processData: false,
+            enctype: 'multipart/form-data'
+            }).done(function (data) {
+                $("#dvCSV").html('');
+                $("#dvCSV").append(data);
+            }); 
+            event.preventDefault();
+        });
+        
         //Apply transmations:
         $("#MeanMedianImpute").click(function()
         {

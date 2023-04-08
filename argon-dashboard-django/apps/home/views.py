@@ -58,10 +58,29 @@ def dataCleaning(request):
     if(request.method == 'POST'):
         if request.POST['method'] =='impute':
             return impute(request)
-        if request.POST['method'] == 'dropFeature':
+        elif request.POST['method'] == 'dropFeature':
             return dropFeature(request)
-        if request.POST['method'] == 'dropCorrelated':
+        elif request.POST['method'] == 'dropCorrelated':
+            
+            request.POST._mutable=True
+            request.POST['target']=request.POST['target'].strip('\r\n') #strip trailing escape sequences if needed
             return dropCorrelated(request)
+        elif request.POST['method'] == 'autoClean': #Since they all return an html file just ignore them,all functions save their modifications to the data regardless
+            #Currently we impute by median, drop anything with 0.9 correlation and outlier removal
+            #Need to input in the special attributes for each feature
+            request.POST._mutable=True
+            request.POST['target']=request.POST['target'].strip('\r\n')
+            #Imputing:
+            request.POST['imputeZero']='No'
+            request.POST['imputeMethod']='Median'
+            request.POST['feature1']='All'
+            impute(request)
+            #Correlation:
+            request.POST["corrThreshold"]=0.9
+            dropCorrelated(request)
+            #Outliers: (No parameters needed for now)
+            return dropOutlier(request) #return the html of this one since it'll basically have all the previous changes in it.
+
     return render(request, 'home/cleaning.html')
 
 @login_required(login_url="/login/")
