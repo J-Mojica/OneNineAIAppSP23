@@ -17,6 +17,7 @@ import numpy as np
 from .forms import UploadFileForm
 from .models import *
 from .datacleanup import *
+from .retrain import *
 
 @login_required(login_url="/login/")
 def index(request):
@@ -95,6 +96,9 @@ def modelMonitoring(request):
 def modelReTraining(request):
     # HERE GOES RE-TRAINING
 
+    if(request.method == 'POST'):
+        return retrain_model(request)
+
     context = {'segment': 'retraining'}
     return render(request, 'home/retraining.html', context)
 
@@ -113,6 +117,9 @@ def useCases(request):
 @login_required(login_url="/login/")
 def createModel(request):
     # HERE GOES CREATE MODEL
+
+    if request.method == 'POST':
+        return create_model(request)
 
     context = {'segment': 'create'}
     return render(request, 'home/create.html', context)
