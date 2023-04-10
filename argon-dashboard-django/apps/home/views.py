@@ -17,6 +17,7 @@ import numpy as np
 from .forms import UploadFileForm
 from .models import *
 from .datacleanup import *
+from .modelMonitoring import*
 
 @login_required(login_url="/login/")
 def index(request):
@@ -65,10 +66,11 @@ def dataCleaning(request):
 @login_required(login_url="/login/")
 def modelMonitoring(request):
     # HERE GOES MLFLOW
-    #model = sklearn.linear_model.LogisticRegression()
-    #context = {'model': model}
-    context = {'segment': 'monitoring'}
-    return render(request, 'home/monitoring.html', context)
+        if request.method == 'POST':
+            if request.POST['method'] == 'linearRegression' or 'logisticRegression' or 'decisionTrees' or 'randomForest':
+                return model_Monitor(request)
+        else:
+            return render(request, 'home/monitoring.html')
 
 @login_required(login_url="/login/")
 def modelReTraining(request):

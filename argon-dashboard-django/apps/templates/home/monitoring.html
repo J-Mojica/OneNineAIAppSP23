@@ -1,3 +1,265 @@
-{% extends 'layouts/base.html' %} {% block title %} Model Monitoring {% endblock title %}
+{% extends 'layouts/base.html' %} {% block title %} Data Cleaning {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}
+<style>
+    .container {
+        width: 600px;
+        /* height:150px; */
+        margin: auto;
+    }
+    .progressbar {
+        counter-reset: step;
+        width: 100%;
+    }
+    .progressbar li {
+        list-style-type: none;
+        width: 20%;
+        float: left;
+        font-size: 12px;
+        position: relative;
+        text-align: center;
+        text-transform: uppercase;
+        color: #7d7d7d;
+    }
+    .progressbar li:before {
+        width: 30px;
+        height: 30px;
+        content: counter(step);
+        counter-increment: step;
+        line-height: 30px;
+        border: 2px solid #7d7d7d;
+        display: block;
+        text-align: center;
+        margin: 0 auto 10px auto;
+        border-radius: 50%;
+        background-color: white;
+    }
+    .progressbar li:after {
+        width: 100%;
+        height: 2px;
+        content: "";
+        position: absolute;
+        background-color: #7d7d7d;
+        top: 15px;
+        left: -50%;
+        z-index: -1;
+    }
+    .progressbar li:first-child:after {
+        content: none;
+    }
+    .progressbar li.active {
+        color: green;
+    }
+    .progressbar li.active:before {
+        border-color: #55b776;
+    }
+    .progressbar li.active + li:after {
+        background-color: #55b776;
+    }
+</style>
+{% endblock stylesheets %} {% block content %}
+
+<div class="header bg-gradient-primary pb-8 pt-5">
+  <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4" style="width: max-content">
+    <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+      <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
+      <li class="breadcrumb-item"><a href="/projects/createnew/">AI Project</a></li>
+      <li class="breadcrumb-item"><a href="#">{{ projectName }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Monitor Models</li>
+    </ol>
+  </nav>    
+</div>	
+	<div class="container-fluid mt--7">
+      <div class="row">
+        <div id="col">
+          
+            <div class="m-5" id="transformerGroup">
+                {% comment %} start {% endcomment %}
+                <!-- START UPLOAD DATA -->
+                <form action= "{% url 'modelMonitoring' %}" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="mb-0">New Project</h2>
+                        </div>
+                    </div>
+  
+                    <div class="card-body">
+                    <p class="card-text mb-4">This section allows us to build and monitor ML Models</p>
+                </form>
+            </div>
+              
+          <form method="post" action="/projects/createnew/" enctype="multipart/form-data"  id="algoForm" data-algo-url="/ajax/load-subalgorithms/" novalidate onsubmit="addDataToTextAreaAndSubmit();">
+            <input type="hidden" name="csrfmiddlewaretoken" value="oax6YxXGT43mSEOUjYeHi8zKja6kvsL0B0PzdaCNxzWswKSGDYG8c2qjGrAFsPt9">
+            </form>            
+            <div class="card">
+              <!-- Card header -->
+              <div class="card-header">
+                <h3 class="mb-0">Project Name:</h3>
+              </div>
+              <!-- Card body -->
+              <div class="card-body">
+                <div class="form-group">
+                  <div class="input-group input-group-merge">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"><i class="fas fa-info"></i></span>
+                    </div>
+                    <input required name="name" class="form-control" placeholder="Enter Project Name..." type="text" id='id_name'>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <!-- Card header -->
+              <div class="card-header">
+                <h3 class="mb-0">Project Goals:</h3>
+              </div>
+              <!-- Card body -->
+              <div class="card-body">
+                <textarea  name="goals" id="projectGoals" placeholder="Enter your goals"></textarea >
+                
+              </div>
+            </div>
+
+            <div class="card">
+              <!-- Card header -->
+              <div class="card-header">
+                <h3 class="mb-0">Tags</h3>
+              </div>
+              <!-- Card body -->
+              <div class="card-body">
+                  <input required name="tags" type="text" placeholder="Add more tags to your project..." class="form-control" value="AI Project, Machine Learning" data-toggle="tags" id="tags1" />
+              </div>
+            </div>
+
+            <div class="card">
+              <!-- Card header -->
+              <div class="card-header">
+                <h3 class="mb-0">Select Algorithm:</h3>
+              </div>
+              <!-- Card body -->
+              <div class="card-body">
+                <div class="row">
+
+                  <div class="col-xl-4 col-md-6">
+                    <div class="card card-stats">
+                      <div class="card-body">
+                        <p class="mt-3 mb-0 text-sm">
+                          <div class="card-body pt-3 pb-1">
+                            <form method="POST">
+                                {% csrf_token %}
+                                <button id="linearRegression" name="method" value="linearRegression" class="btn btn-primary">Linear Regression</button>      
+                            </div>
+                        </p>
+                        <p class="m-1 text-sm">
+                            Linear Regression is a supervised learning algorithm used to model the relationship between a dependent variable and one or more independent variables by fitting a linear equation to the observed data. The goal of linear regression is to find the best-fitting straight line through the data points to make predictions about new, unseen data.
+                        </p>
+                      </div>
+                    </div>
+                </div>
+
+                  <div class="col-xl-4 col-md-6">
+                    <div class="card card-stats">
+                      <div class="card-body">
+                            <p class="mt-3 mb-0 text-sm">
+                                <div class="card-body pt-3 pb-1">
+                                    <form method="POST">
+                                        {% csrf_token %}
+                                        <button id="logisticRegression" name="method" value="logisticRegression" class="btn btn-primary">Logistic Regression</button>
+                                    </form>
+                                </div>
+                            </p>
+                            <p class="m-1 text-sm">
+                                Logistic Regression is a statistical method for analyzing a dataset in which there are one or more independent variables that determine an outcome. It is a binary classification algorithm that predicts the probability of an event occurring by fitting a sigmoid function to the input data.
+                            </p>
+                        </div>
+                        
+                    </div>
+                  </div>
+
+                  <div class="col-xl-4 col-md-6">
+                    <div class="card card-stats">
+                      <div class="card-body">
+                        <p class="mt-3 mb-0 text-sm">
+                          <div class="card-body pt-3 pb-1">
+                            <form method="POST">
+                                {% csrf_token %}
+                                <button id="decisionTrees" name="method" value="decisionTrees" class="btn btn-primary">Decision Trees</button>
+                            </form>
+                        </div>
+                        </p>
+                        <p class="m-1 text-sm">
+                            Decision Trees are a popular machine learning algorithm that uses a tree-like structure to represent a set of decisions and their possible consequences. Each internal node of the tree represents a decision based on one or more input features, and each leaf node represents a final decision or prediction.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
 
 
+                  <div class="col-xl-4 col-md-6">
+                    <div class="card card-stats">
+                      <div class="card-body">
+                        <p class="mt-3 mb-0 text-sm">
+                          <div class="card-body pt-3 pb-1">
+                            <form method="POST">
+                                {% csrf_token %}
+                                <button id="randomForest" name="method" value="randomForest" class="btn btn-primary">Random Forest</button>
+                            </form>
+                        </div>
+                        </p>
+                        <p class="m-1 text-sm">
+                            Random Forest is an ensemble learning method that combines multiple decision trees to improve the accuracy and robustness of predictions. It creates a large number of decision trees and aggregates their predictions to reduce overfitting and improve accuracy. Each decision tree in the random forest is constructed using a subset of the input data and a random selection of input features.
+                      </div>
+                    </div>
+                  </div>
+
+                  
+
+                </div>        
+              </div>
+            </div>
+
+                   
+            <button type="submit" class="btn btn-primary" id='upload-btn'>Continue</button>
+          </form>
+        
+            <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+            <script>
+                $("input[type=radio][name=algorithm]").change(function () {
+                    var url = $("#algoForm").attr("data-algo-url");  // get the url of the `load_cities` view
+                    var algorithm_id = $(this).val();  // get the selected country ID from the HTML input
+                    // console.log(url, algorithm_id)
+                    $.ajax({                       // initialize an AJAX request
+                            url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
+                            data: {
+                                'algorithm': algorithm_id       // add the country id to the GET parameters
+                                },
+                                success: function (data) {   // `data` is the return of the `load_cities` view function
+                                    // console.log(data)
+                                    $("#subAlgorithmSection").html(data);  // replace the contents of the city input with the data that came from the server
+                                    }
+
+      });
+
+    });
+  </script>
+   
+	</div>
+	</div>
+
+
+
+</div>
+
+<script src="/static/assets/vendor/jquery/dist/jquery.min.js"></script>
+<script src="/static/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/static/assets/vendor/js-cookie/js.cookie.js"></script>
+<script src="/static/assets/vendor/jquery.scrollbar/jquery.scrollbar.min.js"></script>
+<script src="/static/assets/vendor/jquery-scroll-lock/dist/jquery-scrollLock.min.js"></script>
+<!-- Optional JS -->
+<script src="/static/assets/vendor/chart.js/dist/Chart.min.js"></script>
+<script src="/static/assets/vendor/chart.js/dist/Chart.extension.js"></script>
+<script src="/static/assets/vendor/sweetalert2/dist/sweetalert2.min.js"></script>
+{% endblock content %}
