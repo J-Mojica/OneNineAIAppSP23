@@ -95,9 +95,14 @@
                         <input type="file" id="fileUpload" />
                         <input type="submit" value="Upload" id="upload" />
                     </form>
+                    <div id="backendDatasets" class="card">
+                        <div class="card-body">
+                             Or select a dataset previously stored on our server:
+                            <select id="dataSets" > <option value="" hidden selected>Select a dataset</option> </select>
+                        </div>
+                    </div>
                     <!-- END UPLOAD DATA -->
                     <div class="card" id="dvCSV">
-
                     </div>						
                     <div class="card">
                         <div class="card-header" id="automatedCleanupHead" data-toggle="collapse" data-target="#collapseAutomatedCleanup" aria-expanded="false" aria-controls="collapseAutomatedCleanup">
@@ -1105,24 +1110,71 @@
     let fileName='';
     let Columns=[];
     const featuresImplemented=4;
+    
     $(function () 
     {
-        function getCookie(name) {
-        var cookieValue = null;
-        if (document.cookie && document.cookie != '') {
-            var cookies = document.cookie.split(';');
-            for (var i = 0; i < cookies.length; i++) {
-                var cookie = jQuery.trim(cookies[i]);
-                // Does this cookie string begin with the name we want?
-                if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
+        
+        function getCookie(name) 
+        {
+            var cookieValue = null;
+            if (document.cookie && document.cookie != '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
                 }
             }
+            return cookieValue;
         }
-        return cookieValue;
-        }
+        
+        
         var csrftoken = getCookie('csrftoken');
+        //Post request to get the dataset names
+        var fd = new FormData();
+        fd.append('csrfmiddlewaretoken',csrftoken);
+        $.ajax({
+        type: "POST",
+        url: "getDataset",
+        data: fd,
+        contentType: false,
+        processData: false,
+        enctype: 'multipart/form-data'
+        }).done(function (data) {
+            var select = document.getElementById("dataSets");         
+            for(dataset in data['dataSets']) 
+                {            
+                    //List all datasets stored on our backend.
+                    select.options[select.options.length] = new Option(data['dataSets'][dataset], data['dataSets'][dataset]);
+                    
+                }
+        });
+
+        //When the user selects a dataset from our backend update the filename and display a preview of that dataset
+        $("#dataSets").change(function()
+        {
+            fileName=$("#dataSets").val();
+            var fd = new FormData();
+            fd.append('csrfmiddlewaretoken',csrftoken);
+            fd.append('fileName', fileName);
+            fd.append('method','view');
+            $.ajax({
+            type: "POST",
+            url: "",
+            data: fd,
+            contentType: false,
+            processData: false,
+            enctype: 'multipart/form-data'
+            }).done(function (data) {
+                $("#dvCSV").html('');
+                $("#dvCSV").append(data);
+            });
+
+        });
+        
         //Upload dataset to backend
         $("#upload").bind("click", function () 
         {
@@ -1201,6 +1253,7 @@
             enctype: 'multipart/form-data'
             }).done(function (data) {
             console.log(fd);
+            $('#backendDatasets').hide(); //Hide the option to select a dataset.
             });
 
             event.preventDefault();

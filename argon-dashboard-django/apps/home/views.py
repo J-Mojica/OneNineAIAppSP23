@@ -5,11 +5,10 @@ Copyright (c) 2019 - present AppSeed.us
 
 from django import template
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.template import loader
 from django.urls import reverse
 from django.shortcuts import render
-from django.http import HttpResponse
 from django.core.files.storage import FileSystemStorage
 import pandas as pd
 import json as json
@@ -18,7 +17,8 @@ from .forms import UploadFileForm
 from .models import *
 from .datacleanup import *
 from .retrain import *
-
+import glob
+import os
 @login_required(login_url="/login/")
 def index(request):
     context = {'segment': 'index'}
@@ -81,6 +81,9 @@ def dataCleaning(request):
             dropCorrelated(request)
             #Outliers: (No parameters needed for now)
             return dropOutlier(request) #return the html of this one since it'll basically have all the previous changes in it.
+        elif request.POST['method']=='view':
+            df=pd.read_csv('./users/'+request.user.username+'/'+request.POST['fileName'],skipinitialspace=True)
+            return HttpResponse(df.head(200).to_html(classes='dataframe table table-striped table-bordered dataTable no-footer'))
 
     return render(request, 'home/cleaning.html')
 
@@ -135,3 +138,11 @@ def upload(request):
     #    for chunk in file.chunks():
     #        destination.write(chunk)
     return HttpResponse("Works!") #Just sending something that's ignored by jquery
+
+def getDataset(request):
+    data = [os.path.basename(x) for x in glob.glob('./users/'+request.user.username+'/*.csv')]
+    return JsonResponse({'dataSets':data})
+
+def getPKL(request):
+    data = [os.path.basename(x) for x in glob.glob('./users/'+request.user.username+'/*.pkl')]
+    return JsonResponse({'dataSets':data})

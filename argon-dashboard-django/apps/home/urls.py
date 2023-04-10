@@ -19,8 +19,7 @@ urlpatterns = [
     path('cleaning/upload',views.upload,name='upload'),
     path('create/upload',views.upload,name='upload'),
     path('retrain/upload',views.upload,name='upload'),
-    #path('cleaning/impute',views.impute,name='impute'),
-    #path('cleaning/dropFeature',views.dropFeature,name='dropFeature'),
+    path('cleaning/getDataset',views.getDataset,name='getDataset'),
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
 
