@@ -45,6 +45,8 @@ y = iris.target
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 def model_Monitor(request):
+        mlflow_server_cmd = "mlflow ui"
+        subprocess.Popen(mlflow_server_cmd, shell=True)
         if request.POST['method'] == 'linearRegression':
                 mlflow.set_experiment(experiment_name="my_exp_Linear")
                 with mlflow.start_run(run_name="Linear_regression_1"):
@@ -97,10 +99,5 @@ def model_Monitor(request):
                         mlflow.sklearn.log_model(rf_clf, "random-forest-model")
                 
         mlflow.end_run()
-        #mlflow_server_cmd = "mlflow ui"
-        #subprocess.Popen(mlflow_server_cmd, shell=True)
-        # Open the MLflow UI in a web browser
-        #webbrowser.open("http://localhost:5000")
         return HttpResponseRedirect("http://localhost:5000")
 
-        #return None
