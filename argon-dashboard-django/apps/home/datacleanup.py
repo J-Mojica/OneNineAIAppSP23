@@ -46,14 +46,34 @@ def impute(request):
             except:
                 df = df.fillna(df[request.POST['feature1']].value_counts().index[0])
     df.to_csv('./users/'+request.user.username+'/'+request.POST['fileName'],index=False)
-    return HttpResponse(df.to_html(classes='dataframe table table-striped table-bordered dataTable no-footer'))
+    return HttpResponse(df.head(200).to_html(classes='dataframe table table-striped table-bordered dataTable no-footer'))
 
 def dropFeature(request):
     print(request.POST)
     df=pd.read_csv('./users/'+request.user.username+'/'+request.POST['fileName'],skipinitialspace=True)
     df.drop(request.POST['feature2'], axis=1,inplace=True)
     df.to_csv('./users/'+request.user.username+'/'+request.POST['fileName'],index=False)
-    return HttpResponse(df.to_html(classes='dataframe table table-striped table-bordered dataTable no-footer'))
+    return HttpResponse(df.head(200).to_html(classes='dataframe table table-striped table-bordered dataTable no-footer'))
+
+def dropCorrelated(request):
+    print(request.POST)
+    df=pd.read_csv('./users/'+request.user.username+'/'+request.POST['fileName'],skipinitialspace=True)
+    cor_matrix = df.corr().abs()
+    upper_tri = cor_matrix.where(np.triu(np.ones(cor_matrix.shape),k=1).astype(np.bool))
+    to_drop = [column for column in upper_tri.columns if (column!=request.POST["target"]) and any(upper_tri[column] > float(request.POST["corrThreshold"]))]
+    print(to_drop)
+    df.drop(columns=to_drop, axis=1,inplace=True)
+    df.to_csv('./users/'+request.user.username+'/'+request.POST['fileName'],index=False)
+    return HttpResponse(df.head(200).to_html(classes='dataframe table table-striped table-bordered dataTable no-footer'))
+
+def dropOutlier(request):
+    df=pd.read_csv('./users/'+request.user.username+'/'+request.POST['fileName'],skipinitialspace=True)
+    Q1 = df.quantile(0.25)
+    Q3 = df.quantile(0.75)
+    IQR = Q3 - Q1
+    df = df[~((df < (Q1 - 1.5 * IQR)) |(df > (Q3 + 1.5 * IQR))).any(axis=1)]
+    df.to_csv('./users/'+request.user.username+'/'+request.POST['fileName'],index=False)
+    return HttpResponse(df.head(200).to_html(classes='dataframe table table-striped table-bordered dataTable no-footer'))
 #to bypass issues where we need to send multiple html things or html + other stuff
 #Maybe you could store a temp html file and then GET request it from frontend
 #Or you could append all wanted html things into one html file and parse through it in frontend
