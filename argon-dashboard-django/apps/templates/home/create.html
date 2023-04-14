@@ -95,6 +95,12 @@
                         <input type="file" id="fileUpload" />
                         <input type="submit" value="Upload" id="upload" />
                     </form>
+                    <div id="backendDatasets" class="card">
+                        <div class="card-body">
+                             Or select a dataset previously stored on our server:
+                            <select id="dataSets" > <option value="">Select a dataset</option> </select>
+                        </div>
+                    </div>
                     <!-- END UPLOAD DATA -->
                     <div class="card" id="dvCSV">
 
@@ -960,6 +966,65 @@
     }
 </script>
 
+<script>
+    fetch(
+        "/listfiles",
+        {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }
+
+    ).then((response) => {
+        return response.json();
+    }).then((data) => {
+        // selected
+        let params = new URLSearchParams(document.location.search);
+        let datasetName = params.get("datasetName");
+        if (datasetName == null) {
+            document.querySelector("#dataSets option").selected = true;
+        }
+        // console.log(data);
+        var select = document.getElementById("dataSets");
+        for (var i = 0; i < data["csv"].length; i++) {
+            var opt = data["csv"][i];
+            var el = document.createElement("option");
+            if (datasetName == opt) {
+                el.selected = true;
+            }
+            el.innerText = opt;
+            el.value = opt;
+            select.appendChild(el);
+        }
+    });
+
+    document.getElementById("dataSets").addEventListener("change", function () {
+        document.getElementById("feature1").innerHTML = "";
+        fetch(
+            "/getfile?filename=" + this.value + "&table=true",
+            {
+                method: "GET",
+            }
+        ).then((response) => {
+            response.text().then((text) => {
+                document.getElementById("dvCSV").innerHTML = text;
+
+                let thead = document.querySelector("#dvCSV table tr");
+
+                Array.from(thead.children).forEach((element) => {
+                    let option = document.createElement("option");
+                    option.value = element.innerText;
+                    option.innerText = element.innerText;
+                    document.getElementById("feature1").appendChild(option);
+                });
+
+
+            });
+        });
+    });
+</script>
+
 <script type="text/javascript">
     let fileName='';
     let Columns=[];
@@ -1013,6 +1078,7 @@
                         }
                         $("#dvCSV").html('');
                         $("#dvCSV").append(table);
+                        document.getElementById("feature1").innerHTML = "";
                         for(let i=1;i<=featuresImplemented;i++) //Currently have 2 features implemented.
                         {
                             var select = document.getElementById("feature"+i);
@@ -1063,8 +1129,16 @@
         });
         $("#select_form").submit(function(event)
         {
-            var fd = new FormData(document.querySelector('#select_form'))
-            fd.append('fileName',fileName);
+            var fd = new FormData(document.querySelector('#select_form'));
+
+            let form_fname = document.getElementById("dataSets").value;
+
+            if (form_fname === ""){
+                form_fname = fileName;
+            }
+
+            fd.append('fileName',form_fname);
+
             console.log(fd);
 
             //console.log(document.querySelector('#Impute'))

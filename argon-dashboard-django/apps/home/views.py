@@ -16,6 +16,7 @@ import numpy as np
 from .forms import UploadFileForm
 from .modelMonitoring import *
 from .datacleanup import *
+from .retrain import *
 
 @login_required(login_url="/login/")
 def index(request):
@@ -125,6 +126,48 @@ def createModel(request):
 
     context = {'segment': 'create'}
     return render(request, 'home/create.html', context)
+
+@login_required(login_url="/login/")
+def listfiles(request):
+
+    try:
+        ls = os.listdir('./users/'+request.user.username)
+
+        file_extensions = set([f.split('.')[-1] for f in ls])
+
+        # Ex: {"csv": ["file1.csv", "file2.csv"], "pkl": ["model.pkl"]]}
+        file_dict = {k:v for k,v in [(ext,[f for f in ls if f.split('.')[-1] == ext]) for ext in file_extensions]}
+    except:
+        file_dict = {}
+
+    response = HttpResponse(
+                json.dumps(file_dict),
+                headers={
+                    "Content-Type": "application/json",
+                }
+            )
+
+    return response
+
+@login_required(login_url="/login/")
+def getfile(request):
+    #get filename from get parameter
+    filename = request.GET.get('filename', None)
+    table = request.GET.get('table', None)
+
+    if filename is None or not isinstance(filename, str):
+        return HttpResponse("")
+
+    ## prevent directory traversal
+    filename = filename.replace('/', '')
+    if filename not in os.listdir('./users/'+request.user.username):
+        return HttpResponse("")
+
+    if table == "true":
+        df=pd.read_csv(os.path.join('./users/', request.user.username, filename),skipinitialspace=True)
+        return HttpResponse(df.head(200).to_html(classes='dataframe table table-striped table-bordered dataTable no-footer'))
+    
+    return HttpResponse("")
 
 # Create your views here.
 def upload(request):
