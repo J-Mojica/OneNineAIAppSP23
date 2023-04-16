@@ -202,6 +202,10 @@
                                                                         <select name="model_type" id="model_type">
                                                                             <option value="SGDRegressor" selected>SGDRegressor</option>
                                                                             <option value="SGDClassifier">SGDClassifier</option>
+                                                                            <option value="LogisticRegression">LogisticRegression</option>
+                                                                            <option value="LinearRegression">LinearRegression</option>
+                                                                            <option value="DecisionTreeClassifier">DecisionTreeClassifier</option>
+                                                                            <option value="DecisionTreeRegressor">DecisionTreeRegressor</option>
                                                                         </select>
                                                                         <br><br>
                                                                         Select Feature to Predict:
@@ -1158,7 +1162,7 @@
                 var blob = new Blob([data], {type: 'application/octet-stream'});
                 var link = document.createElement("a");
                 link.href = window.URL.createObjectURL(blob);
-                link.download = "model.pkl";
+                link.download = "model_dict.pkl";
                 link.click();
             }); 
             event.preventDefault();
