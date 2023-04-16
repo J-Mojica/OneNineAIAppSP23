@@ -87,9 +87,12 @@
                     <h4> AirBnB Prices </h4>
                 
                     <p> 
-                        AirBnB prices can fluctuate based on a number of different factors.
-                        It is hard to manually decide an appropriate pricing. 
-                        One way we could approach this problem is to use linear regression to model 
+                        AirBnB prices can fluctuate based on a number of different factors such as
+                        location, time of year, and number of guests, number of rooms, etc.
+                        An AI model that is able to predict the price of an AirBnB listing based 
+                        on such characteristic can be helpful for hosts to check that the price of 
+                        their listing is competitive and for guests to find the best price for their
+                        stay. We approach this problem by using linear regression to model 
                         the prices.
                     </p>
                     <a class="fst-italic" href="https://www.kaggle.com/datasets/thedevastator/airbnb-prices-in-european-cities?resource=download"> 
@@ -112,8 +115,46 @@
             </div>
         </div>
         <!--End Use case 1-->
-        
+
         <!--Use case 2-->
+        <div class="col-xl-6 col-md-6">
+            <div class="card card-stats">
+              <div class="card-body row h-100">
+                <!-- Left section-->
+                <div class="col-6">
+                    <h4> Hotel Reservations Cancellations </h4>
+                
+                    <p> 
+                        A significant number of hotel 
+                        reservations are called-off due to cancellations or no-shows.  
+                        Cancellations often are made free of charge or
+                        at a low cost which is revenue-diminishing factor for hotels to deal with. Hence,
+                        it is important to predict whether a reservation will be cancelled or not.
+                        For this purpose we implement a random forest classifier to predict the
+                        cancellation status of a reservation.
+                    </p>
+                    <a class="fst-italic" href="https://www.kaggle.com/datasets/ahsan81/hotel-reservations-classification-dataset"> 
+                        Dataset
+                    </a>
+                <hr/>
+                    <h4> Results </h4>
+                        <p> 82.6% Accuracy </p>
+                       <a class="d-flex align-items-center" href="https://youtu.be/IHdy2r9o_aA">
+                        <span class="fst-italic"> View Video </span>
+
+                       <i class="ni ni-bold-right text-primary ms-2"></i> 
+                       </a>
+                </div>
+                <!-- Right section-->
+                <div class="col-6 bg-secondary">
+                    <img class="useImage" src="/static/assets/img/useCases/hotelReservations.webp"> </img>
+                </div>
+              </div>
+            </div>
+        </div>
+        <!--End Use case 2-->
+        
+        <!--Use case 3-->
           <div class="col-xl-6 col-md-6">
             <div class="card card-stats">
               <div class="card-body row h-100">
@@ -145,42 +186,9 @@
               </div>
             </div>
         </div>
-        <!--End Use case 2-->
-
-        <!--Use case 3-->
-          <div class="col-xl-6 col-md-6">
-            <div class="card card-stats">
-              <div class="card-body row h-100">
-                <!-- Left section-->
-                <div class="col-6">
-                    <h4> Car Prices </h4>
-                    <p> 
-                        Often, car prices can be hard to predict as there are many features to take
-                        into account such as brand name, number of doors, car model, etc.
-                        To approach this problem we can use a regression algorithm to predict the price
-                        based on these car features.
-                    </p>
-                    <a class="fst-italic" href="https://www.kaggle.com/datasets/hellbuoy/car-price-prediction"> 
-                        Dataset
-                    </a>
-                <hr/>
-                    <h4> Results </h4>
-                    <p> 
-                        R-squared coeffiecient of 0.9
-                    </p>
-                    <a class="d-flex align-items-center" href="https://youtu.be/V9w0ZTexeE0">
-                        <span class="fst-italic"> View Video </span>
-                        <i class="ni ni-bold-right text-primary ms-2"></i> 
-                    </a>
-                </div>
-                <!-- Right section-->
-                <div class="col-6 bg-secondary">
-                    <img class="useImage" src="/static/assets/img/useCases/carPrices.webp"> </img>
-                </div>
-              </div>
-            </div>
-        </div>
         <!--End Use case 3-->
+
+        
         <!--Use case 4-->
           <div class="col-xl-6 col-md-6">
             <div class="card card-stats">
@@ -250,7 +258,112 @@
         </div>
         <!--End Use case 5-->
 
-        <!--Use case 6-->
+          <!--Use case 6-->
+          <div class="col-xl-6 col-md-6">
+            <div class="card card-stats">
+                <div class="card-body row h-100">
+                <!-- Left section-->
+                <div class="col-6">
+                    <h4> Loan Default </h4>
+                    <p> 
+                        It is in the best interest for both financial institutions and borrowers to be able to predict
+                        whether a person will default on their loan. This task can be accomplished using a classification algorithm.
+                        We use a dataset with more than 67k records to predict a borrowers' loan grade.
+                    </p>
+                    <a class="fst-italic" href="https://www.kaggle.com/datasets/hemanthsai7/loandefault"> 
+                        Dataset
+                    </a>
+                    <hr/>
+                    <h4> Results </h4>
+                    <p> 
+                        [RESULTS MISSING FOR THIS ONE]
+                    </p>
+                    <a class="d-flex align-items-center" href="https://youtu.be/V9w0ZTexeE0">
+                        <span class="fst-italic"> View Video </span>
+                        <i class="ni ni-bold-right text-primary ms-2"></i> 
+                    </a>
+                </div>
+                <!-- Right section-->
+                <div class="col-6 bg-secondary">
+                    <img class="useImage" src="/static/assets/img/useCases/loanDefault.webp"> </img>
+                </div>
+                </div>
+            </div>
+        </div>
+        <!--End Use case 6-->
+
+          <!--Use case 7-->
+          <div class="col-xl-6 col-md-6">
+            <div class="card card-stats">
+              <div class="card-body row h-100">
+                <!-- Left section-->
+                <div class="col-6">
+                    <h4> Credit Card Fraud </h4>
+                    <p> 
+                        Credit card fraud is a major problem for both credit card issuers 
+                        and consumers alike, and one way that the industry is combating 
+                        this problem is through the use of classification algorithms.
+                        This allows credit card companies to quickly 
+                        identify and flag potentially fraudulent transactions.
+                    </p>
+                    <a class="fst-italic" href="https://www.kaggle.com/datasets/dhanushnarayananr/credit-card-fraud"> 
+                        Dataset
+                    </a>
+                <hr/>
+                    <h4> Results </h4>
+                    <p> 
+                        [RESULTS MISSING FOR THIS ONE]
+                    </p>
+                    <a class="d-flex align-items-center" href="https://youtu.be/V9w0ZTexeE0">
+                        <span class="fst-italic"> View Video </span>
+                        <i class="ni ni-bold-right text-primary ms-2"></i> 
+                    </a>
+                </div>
+                <!-- Right section-->
+                <div class="col-6 bg-secondary">
+                    <img class="useImage" src="/static/assets/img/useCases/creditCard.webp"> </img>
+                </div>
+              </div>
+            </div>
+        </div>
+        <!--End Use case 7-->
+
+        <!--Use case 8-->
+        <div class="col-xl-6 col-md-6">
+            <div class="card card-stats">
+              <div class="card-body row h-100">
+                <!-- Left section-->
+                <div class="col-6">
+                    <h4> Car Prices </h4>
+                    <p> 
+                        Often, car prices can be hard to predict as there are many features to take
+                        into account such as brand name, number of doors, car model, etc.
+                        To approach this problem we can use a regression algorithm to predict the price
+                        based on these car features.
+                    </p>
+                    <a class="fst-italic" href="https://www.kaggle.com/datasets/hellbuoy/car-price-prediction"> 
+                        Dataset
+                    </a>
+                <hr/>
+                    <h4> Results </h4>
+                    <p> 
+                        R-squared coeffiecient of 0.9
+                    </p>
+                    <a class="d-flex align-items-center" href="https://youtu.be/V9w0ZTexeE0">
+                        <span class="fst-italic"> View Video </span>
+                        <i class="ni ni-bold-right text-primary ms-2"></i> 
+                    </a>
+                </div>
+                <!-- Right section-->
+                <div class="col-6 bg-secondary">
+                    <img class="useImage" src="/static/assets/img/useCases/carPrices.webp"> </img>
+                </div>
+              </div>
+            </div>
+        </div>
+        <!--End Use case 8-->
+
+        <!--Use case 9-->
         <div class="col-xl-6 col-md-6">
             <div class="card card-stats">
               <div class="card-body row h-100">
@@ -284,79 +397,7 @@
               </div>
             </div>
         </div>
-        <!--End Use case 6-->
-
-        <!--Use case 7-->
-        <div class="col-xl-6 col-md-6">
-            <div class="card card-stats">
-                <div class="card-body row h-100">
-                <!-- Left section-->
-                <div class="col-6">
-                    <h4> Loan Default </h4>
-                    <p> 
-                        It is in the best interest for both financial institutions and borrowers to be able to predict
-                        whether a person will default on their loan. This task can be accomplished using a classification algorithm.
-                        We use a dataset with more than 67k records to predict a borrowers' loan grade.
-                    </p>
-                    <a class="fst-italic" href="https://www.kaggle.com/datasets/hemanthsai7/loandefault"> 
-                        Dataset
-                    </a>
-                    <hr/>
-                    <h4> Results </h4>
-                    <p> 
-                        [RESULTS MISSING FOR THIS ONE]
-                    </p>
-                    <a class="d-flex align-items-center" href="https://youtu.be/V9w0ZTexeE0">
-                        <span class="fst-italic"> View Video </span>
-                        <i class="ni ni-bold-right text-primary ms-2"></i> 
-                    </a>
-                </div>
-                <!-- Right section-->
-                <div class="col-6 bg-secondary">
-                    <img class="useImage" src="/static/assets/img/useCases/healthInsurance.webp"> </img>
-                </div>
-                </div>
-            </div>
-        </div>
-        <!--End Use case 7-->
-
-        <!--Use case 8-->
-        <div class="col-xl-6 col-md-6">
-            <div class="card card-stats">
-              <div class="card-body row h-100">
-                <!-- Left section-->
-                <div class="col-6">
-                    <h4> Credit Card Fraud </h4>
-                    <p> 
-                        Credit card fraud is a major problem for both credit card issuers 
-                        and consumers alike, and one way that the industry is combating 
-                        this problem is through the use of classification algorithms.
-                        This allows credit card companies to quickly 
-                        identify and flag potentially fraudulent transactions.
-                    </p>
-                    <a class="fst-italic" href="https://www.kaggle.com/datasets/dhanushnarayananr/credit-card-fraud"> 
-                        Dataset
-                    </a>
-                <hr/>
-                    <h4> Results </h4>
-                    <p> 
-                        [RESULTS MISSING FOR THIS ONE]
-                    </p>
-                    <a class="d-flex align-items-center" href="https://youtu.be/V9w0ZTexeE0">
-                        <span class="fst-italic"> View Video </span>
-                        <i class="ni ni-bold-right text-primary ms-2"></i> 
-                    </a>
-                </div>
-                <!-- Right section-->
-                <div class="col-6 bg-secondary">
-                    <img class="useImage" src="/static/assets/img/useCases/creditCard.webp"> </img>
-                </div>
-              </div>
-            </div>
-        </div>
-        <!--End Use case 8-->
-                
-
+        <!--End Use case 9-->
     </div>
 </div>
 {% endblock content %} 
