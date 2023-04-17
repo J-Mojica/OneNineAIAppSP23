@@ -17,6 +17,7 @@ from .forms import UploadFileForm
 from .modelMonitoring import *
 from .datacleanup import *
 from .retrain import *
+import glob
 
 @login_required(login_url="/login/")
 def index(request):
@@ -85,6 +86,28 @@ def dataCleaning(request):
             return HttpResponse(df.head(200).to_html(classes='dataframe table table-striped table-bordered dataTable no-footer'))
 
     return render(request, 'home/cleaning.html')
+
+@login_required(login_url="/login/")
+def dataMerge(request):
+    # HERE GOES MLFLOW
+        if request.method == 'POST':
+            if request.POST['method']=='view':
+                df=pd.read_csv('./users/'+request.user.username+'/'+request.POST['fileName'],skipinitialspace=True)
+                return HttpResponse(df.head(200).to_html(classes='dataframe table table-striped table-bordered dataTable no-footer'))
+            elif request.POST['method']=='append':
+                df=pd.read_csv('./users/'+request.user.username+'/'+request.POST['fileName'],skipinitialspace=True)
+                df2=pd.read_csv('./users/'+request.user.username+'/'+request.POST['fileName2'],skipinitialspace=True)
+                dataMerge=pd.concat([df, df2])
+                dataMerge.to_csv('./users/'+request.user.username+'/'+request.POST['fileName'][:-4]+'_'+request.POST['fileName2'][:-4]+'Merge.csv',index=False)
+                return HttpResponse(dataMerge.head(200).to_html(classes='dataframe table table-striped table-bordered dataTable no-footer'))
+            elif request.POST['method']=='merge':
+                df=pd.read_csv('./users/'+request.user.username+'/'+request.POST['fileName'],skipinitialspace=True)
+                df2=pd.read_csv('./users/'+request.user.username+'/'+request.POST['fileName2'],skipinitialspace=True)
+                dataMerge=df.merge(df2,how=request.POST['mergeType'],left_on=request.POST['feature1'].strip('\r\n'),right_on=request.POST['feature2'].strip('\r\n'))
+                dataMerge.to_csv('./users/'+request.user.username+'/'+request.POST['fileName'].strip('\r\n')[:-4]+'_'+request.POST['fileName2'].strip('\r\n')[:-4]+'Merge.csv',index=False)
+                return HttpResponse(dataMerge.head(200).to_html(classes='dataframe table table-striped table-bordered dataTable no-footer'))
+        else:
+            return render(request, 'home/merging.html')
 
 @login_required(login_url="/login/")
 def modelMonitoring(request):
@@ -184,6 +207,12 @@ def upload(request):
 def getDataset(request):
     data = [os.path.basename(x) for x in glob.glob('./users/'+request.user.username+'/*.csv')]
     return JsonResponse({'dataSets':data})
+
+def getDatasetCols(request):
+    df=pd.read_csv('./users/'+request.user.username+'/'+request.POST['fileName'],skipinitialspace=True)
+    cols=list(df.columns)
+    return JsonResponse({'cols':cols})
+
 
 def getPKL(request):
     data = [os.path.basename(x) for x in glob.glob('./users/'+request.user.username+'/*.pkl')]

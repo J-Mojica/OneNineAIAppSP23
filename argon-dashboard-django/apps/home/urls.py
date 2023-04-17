@@ -12,6 +12,7 @@ urlpatterns = [
     path('', views.index, name='home'),
     path('create/', views.createModel, name='createModel'),
     path('cleaning/', views.dataCleaning, name='dataCleaning'),
+    path('merge/',views.dataMerge,name='dataMerge'),
     path('monitoring/', views.modelMonitoring, name='modelMonitoring'),
     path('retraining/', views.modelReTraining, name='modelReTraining'),
     path('errorAnalysis/', views.errorAnalysis, name='errorAnalysis'),
@@ -22,6 +23,9 @@ urlpatterns = [
     path('cleaning/getDataset',views.getDataset,name='getDataset'),
     path('listfiles',views.listfiles,name='listfiles'),
     path('getfile',views.getfile,name='getfile'),
+    path('merge/getDataset',views.getDataset,name='getDataset'),
+    path('merge/upload',views.upload,name='upload'),
+    path('merge/getDatasetCols',views.getDatasetCols,name='getDatasetCols'),
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
 
