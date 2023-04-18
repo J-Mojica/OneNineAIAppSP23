@@ -62,7 +62,6 @@ def dataCleaning(request):
         elif request.POST['method'] == 'dropFeature':
             return dropFeature(request)
         elif request.POST['method'] == 'dropCorrelated':
-            
             request.POST._mutable=True
             request.POST['target']=request.POST['target'].strip('\r\n') #strip trailing escape sequences if needed
             return dropCorrelated(request)

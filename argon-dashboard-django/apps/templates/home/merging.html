@@ -348,7 +348,8 @@
                     enctype: 'multipart/form-data'
                 }).done(function(data){
                     $('#feature2').empty();
-                    var select = document.getElementById("feature2");         
+                    var select = document.getElementById("feature2"); 
+                    Columns2=data['cols']        
                     for(cols in data['cols']) 
                         {            
                             //List all datasets stored on our backend.
@@ -392,6 +393,7 @@
                             if(i==300)
                                 break;
                         }
+                        Columns[Columns.length-1] = Columns[Columns.length-1].replace(/[\n\r]/g,'')
                         $("#upload").attr("disabled", true);
                         $("#dvCSV").html('');
                         $("#dvCSV").append(table);
@@ -444,24 +446,51 @@
 
         $("#append").submit(function(event)
         {
-            var fd = new FormData(document.querySelector('#append'))
-            fd.append('fileName',fileName);
-            fd.append('fileName2',fileName2);
-            console.log(fd);
             event.preventDefault();
-            $.ajax({
-            type: "POST",
-            url: "",
-            data: fd,
-            contentType: false,
-            processData: false,
-            enctype: 'multipart/form-data'
-            }).done(function (data) {
-                $("#dvCSV").html('');
-                $("#dvCSV").append(data);
-            }); 
-            event.preventDefault();
+            if(Columns.length!==Columns2.length)
+            {
+                alert("Datasets must have matching columns!");
+            }
+            let result = false;
 
+            // comparing each element of array 
+            for (let i = 0; i < Columns.length; i++) 
+            {
+
+                if (Columns[i] !== Columns2[i]) 
+                {
+                    return false;
+                    break;
+                } 
+                else 
+                {
+                    result = true;
+                }
+            }
+            if(!result)
+            {
+                alert("Datasets must have matching columns!");
+            }
+            else
+            {
+                var fd = new FormData(document.querySelector('#append'))
+                fd.append('fileName',fileName);
+                fd.append('fileName2',fileName2);
+                console.log(fd);
+                event.preventDefault();
+                $.ajax({
+                type: "POST",
+                url: "",
+                data: fd,
+                contentType: false,
+                processData: false,
+                enctype: 'multipart/form-data'
+                }).done(function (data) {
+                    $("#dvCSV").html('');
+                    $("#dvCSV").append(data);
+                }); 
+            }
+            
         });
 
         $("#merge").submit(function(event)
