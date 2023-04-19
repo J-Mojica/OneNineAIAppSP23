@@ -197,12 +197,11 @@
                                                 >
                                                     <div class="card-body pt-3 pb-1">
                                                         <h5 class="h3 text-uppercase text-secondary">
-                                                            Mean Median Imputer
+                                                            Value Imputer
                                                         </h5>
                                                         <p class="text-secondary">
                                                             <small
-                                                                >Replaces missing data by the mean or median
-                                                                value of the variable</small
+                                                                >Replaces missing data of a variable</small
                                                             >
                                                         </p>
                                                         <button
@@ -229,7 +228,7 @@
                                                     <div class="modal-content">
                                                         <div class="modal-header">
                                                             <h5 class="modal-title" id="exampleModalLabel">
-                                                                Mean Median Imputer
+                                                                Value Imputer
                                                             </h5>
                                                             <button
                                                                 type="button"
@@ -285,11 +284,11 @@
                                                 >
                                                     <div class="card-body pt-3 pb-1">
                                                         <h5 class="h3 text-secondary text-uppercase">
-                                                            Arbitrary Number Imputer
+                                                            Arbitrary Imputer
                                                         </h5>
                                                         <p class="text-secondary">
                                                             <small>
-                                                                Replaces missing numerical data by an arbitrary value
+                                                                Replaces missing data of a variable with a specific value
                                                             </small>
                                                         </p>
                                                         <button
@@ -316,7 +315,7 @@
                                                     <div class="modal-content">
                                                         <div class="modal-header">
                                                             <h5 class="modal-title" id="exampleModalLabel2">
-                                                                Arbitrary Number Imputer
+                                                                Value Imputer
                                                             </h5>
                                                             <button
                                                                 type="button"
@@ -335,13 +334,25 @@
                                                                         enctype="multipart/form-data"
                                                                         id="arbitraryImputerForm"
                                                                     >
+                                                                    <input type="hidden" name="method" value="arbitraryImputer">
                                                                         {% csrf_token %}
+                                                                        Select column:
+                                                                        <select name="feature5" id="feature5">
+                                                                    
+                                                                        </select>
+                                                                        <br>
+                                                                        Impute zero values?
+                                                                        <select name="imputeZero">    
+                                                                        <option value="Yes">Yes</option>
+                                                                        <option value="No" selected="">No</option>
+                                                                        </select>
+                                                                        
                                                                         <label for="arbitraryValue"
                                                                             >Please enter the arbitrary value:</label
                                                                         >
+                                                                        
                                                                         <input
-                                                                            type="number"
-                                                                            step="0.001"
+                                                                            type="text"
                                                                             id="arbitraryValue"
                                                                             name="arbitraryValue"
                                                                             class="form-control"
@@ -1003,13 +1014,13 @@
                                     <div class="col-lg-4">
                                         <!-- <div class="card card-lift--hover  h-100 bg-white" style="border-radius:25px; width:120%"> -->
                                         <div class="card-body py-5">
-                                            <form action="{% url 'modelReTraining' %}" method="get" enctype="multipart/form-data" id="next">
+                                            <form action="{% url 'modelReTraining' %}" method="get" enctype="multipart/form-data" id="retrain">
                                                 <div id="submitBtnLoaderParent">
                                                 <input type="Hidden" id="datasetNameset" name="datasetName" >
                                                     <button
                                                         type="submit"
                                                         class="btn btn-primary btn-lg btn-block"
-                                                        form="next"
+                                                        form="retrain"
                                                         id="submitBtnLoader"
                                                     >
                                                         Retrain
@@ -1017,12 +1028,12 @@
                                                 </div>
                                             </form>
                                             <br>
-                                            <form action="{% url 'createModel' %}" method="get" enctype="multipart/form-data">
-                                                <input type="Hidden" id="datasetNameset" name="datasetName" >
+                                            <form action="{% url 'createModel' %}" method="get" enctype="multipart/form-data" id="create">
+                                                <input type="Hidden" id="datasetNameset2" name="datasetName" >
                                                     <button
                                                         type="submit"
                                                         class="btn btn-primary btn-lg btn-block"
-                                                        form="next"
+                                                        form="create"
                                                         id="submitBtnLoader"
                                                     >
                                                         Create Model
@@ -1110,7 +1121,7 @@
 <script type="text/javascript">
     let fileName='';
     let Columns=[];
-    const featuresImplemented=4;
+    const featuresImplemented=5;
     
     $(function () 
     {
@@ -1158,6 +1169,8 @@
         $("#dataSets").change(function()
         {
             fileName=$("#dataSets").val();
+            document.getElementById("datasetNameset").value = fileName;
+            document.getElementById("datasetNameset2").value = fileName;
             var fd = new FormData();
             fd.append('csrfmiddlewaretoken',csrftoken);
             fd.append('fileName', fileName);
@@ -1172,6 +1185,34 @@
             }).done(function (data) {
                 $("#dvCSV").html('');
                 $("#dvCSV").append(data);
+                var fd = new FormData();
+                fd.append('csrfmiddlewaretoken',csrftoken);
+                fd.append('fileName', fileName);
+                $.ajax({
+                    type: "POST",
+                    url: "getDatasetCols",
+                    data: fd,
+                    contentType: false,
+                    processData: false,
+                    enctype: 'multipart/form-data'
+                }).done(function(data){
+                    Columns=data['cols']
+                    for(let i=1;i<=featuresImplemented;i++) 
+                        {
+                            $('#feature'+i).empty();
+                            var select = document.getElementById("feature"+i);
+                            if(i==1)
+                            {
+                                select.options[select.options.length] = new Option("All", "All");
+                            }
+                            for(cols in data['cols']) 
+                            {
+                                select.options[select.options.length] = new Option(data['cols'][cols], data['cols'][cols]);
+                            }
+                 
+                        }
+                    
+                });
             });
 
         });
@@ -1210,7 +1251,7 @@
                         }
                         $("#dvCSV").html('');
                         $("#dvCSV").append(table);
-                        for(let i=1;i<=featuresImplemented;i++) //Currently have 2 features implemented.
+                        for(let i=1;i<=featuresImplemented;i++) 
                         {
                             var select = document.getElementById("feature"+i);
                             
@@ -1225,6 +1266,7 @@
                     reader.readAsText($("#fileUpload")[0].files[0]);
                     fileName=$("#fileUpload")[0].files[0].name;
                     document.getElementById("datasetNameset").value = fileName;
+                    document.getElementById("datasetNameset2").value = fileName;
                     //const blob = new Blob([$("#fileUpload")[0].files[0]], { type: 'text/csv' });
                     
                 } 
@@ -1329,6 +1371,28 @@
             event.preventDefault();
 
         });
+
+        $("#arbitraryImputerForm").submit(function(event){
+            var fd = new FormData(document.querySelector('#arbitraryImputerForm'))
+            fd.append('fileName',fileName);
+            console.log(fd);
+            event.preventDefault();
+            //console.log(document.querySelector('#Impute'))
+
+            $.ajax({
+            type: "POST",
+            url: "",
+            data: fd,
+            contentType: false,
+            processData: false,
+            enctype: 'multipart/form-data'
+            }).done(function (data) {
+                $("#dvCSV").html('');
+                $("#dvCSV").append(data);
+            }); 
+            event.preventDefault();
+        });
+
         $("#autoClean").submit(function(event)
         {
             var fd = new FormData(document.querySelector('#autoClean'))

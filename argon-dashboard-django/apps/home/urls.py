@@ -12,6 +12,7 @@ urlpatterns = [
     path('', views.index, name='home'),
     path('create/', views.createModel, name='createModel'),
     path('cleaning/', views.dataCleaning, name='dataCleaning'),
+    path('cleaning/getDatasetCols',views.getDatasetCols,name='getDatasetCols'),
     path('merge/',views.dataMerge,name='dataMerge'),
     path('monitoring/', views.modelMonitoring, name='modelMonitoring'),
     path('retraining/', views.modelReTraining, name='modelReTraining'),
