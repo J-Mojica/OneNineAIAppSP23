@@ -122,6 +122,7 @@
                         >
                             Apply
                         </button>
+                        <div id="end-page"></div>
                     </div>
 
                 </div>
@@ -134,8 +135,31 @@
 
 <!-- Specific JS goes HERE -->
 {% block javascripts %}
+
+<script>
+    document.getElementById('applyBtn').onclick = function() {
+
+    var iframe = document.createElement('iframe');
+    iframe.width = "1100";
+    iframe.height = "960";
+    iframe.src = 'http://localhost:5001/';
+    body = document.getElementById("end-page");
+    body.appendChild(iframe);
+};
+</script>
+
+
 <script>
     const uploadBtn = document.getElementById("uploadBtn")
+    uploadBtn.addEventListener('click', () => {
+        console.log("Pene")
+        const file = document.getElementById("file")
+        console.log(file.files[0].name)
+    })
+</script>
+
+<script>
+    const applyBtn = document.getElementById("applyBtn")
     uploadBtn.addEventListener('click', () => {
         console.log("Pene")
         const file = document.getElementById("file")
