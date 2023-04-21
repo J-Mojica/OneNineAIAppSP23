@@ -94,6 +94,14 @@ def dropOutlier(request):
     df = df[~((df < (Q1 - 1.5 * IQR)) |(df > (Q3 + 1.5 * IQR))).any(axis=1)]
     df.to_csv('./users/'+request.user.username+'/'+request.POST['fileName'],index=False)
     return HttpResponse(df.head(200).to_html(classes='dataframe table table-striped table-bordered dataTable no-footer'))
+def replaceValue(request):
+    df=pd.read_csv('./users/'+request.user.username+'/'+request.POST['fileName'],skipinitialspace=True)
+    try:
+        df[request.POST['feature6']].replace(float(request.POST['to_replace']),float(request.POST['value']),inplace=True)
+    except:
+        df[request.POST['feature6']].replace(request.POST['to_replace'],request.POST['value'],inplace=True)
+    return HttpResponse(df.head(200).to_html(classes='dataframe table table-striped table-bordered dataTable no-footer'))
+
 #to bypass issues where we need to send multiple html things or html + other stuff
 #Maybe you could store a temp html file and then GET request it from frontend
 #Or you could append all wanted html things into one html file and parse through it in frontend

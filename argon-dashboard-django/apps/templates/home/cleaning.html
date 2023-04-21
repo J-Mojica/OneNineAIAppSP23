@@ -702,6 +702,7 @@
                                                                         enctype="multipart/form-data"
                                                                         id="replaceValueForm"
                                                                     >
+                                                                    <input type="hidden" name="method" value="replaceValue">
                                                                         {% csrf_token %}
                                                                         <div id="manualSelectCol">
                                                                             <label for="replaceColumn"
@@ -711,16 +712,10 @@
                                                                             <select
                                                                                 data-placeholder="Choose column"
                                                                                 class="select form-control chosen-select"
-                                                                                name="replaceColumn"
-                                                                                id="replaceColumn"
+                                                                                name="feature6"
+                                                                                id="feature6"
                                                                                 required
-                                                                            >
-                                                                                <!-- <option value="all" selected>Select All</option> -->
-                                                                                {% for col in categorical_features %}
-                                                                                <option value="{{ col }}">
-                                                                                    {{ col }}
-                                                                                </option>
-                                                                                {% endfor %}
+                                                                            >                                                                                
                                                                             </select>
                                                                         </div>
                                                                         <br />
@@ -1123,7 +1118,7 @@
 <script type="text/javascript">
     let fileName='';
     let Columns=[];
-    const featuresImplemented=5;
+    const featuresImplemented=6;
     
     $(function () 
     {
@@ -1388,6 +1383,27 @@
 
         $("#arbitraryImputerForm").submit(function(event){
             var fd = new FormData(document.querySelector('#arbitraryImputerForm'))
+            fd.append('fileName',fileName);
+            console.log(fd);
+            event.preventDefault();
+            //console.log(document.querySelector('#Impute'))
+
+            $.ajax({
+            type: "POST",
+            url: "",
+            data: fd,
+            contentType: false,
+            processData: false,
+            enctype: 'multipart/form-data'
+            }).done(function (data) {
+                $("#dvCSV").html('');
+                $("#dvCSV").append(data);
+            }); 
+            event.preventDefault();
+        });
+
+        $("#replaceValueForm").submit(function(event){
+            var fd = new FormData(document.querySelector('#replaceValueForm'))
             fd.append('fileName',fileName);
             console.log(fd);
             event.preventDefault();
