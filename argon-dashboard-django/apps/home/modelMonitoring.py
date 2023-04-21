@@ -5,6 +5,7 @@ import google
 import pickle
 import pandas as pd
 import numpy as np
+import random
 from django.db import models
 from django.contrib.auth.models import User
 from django.views import View
@@ -48,8 +49,8 @@ def model_Monitor(request):
         mlflow_server_cmd = "mlflow ui"
         subprocess.Popen(mlflow_server_cmd, shell=True)
         if request.POST['method'] == 'linearRegression':
-                mlflow.set_experiment(experiment_name="my_exp_Linear")
-                with mlflow.start_run(run_name="Linear_regression_1"):
+                exp_id = mlflow.set_experiment(experiment_name="Linear_regression")
+                with mlflow.start_run(run_name="exp_linearRegrssion_"+str(random.randint(1,100))):
                         mlflow.set_tags(tags)
                         # Execute ElasticNet
                         lr = ElasticNet(alpha=0.2, l1_ratio=0.2, random_state=42)
@@ -61,8 +62,8 @@ def model_Monitor(request):
                 
 
         if request.POST['method'] == 'logisticRegression':
-                mlflow.set_experiment(experiment_name="my_exp_Logistic")
-                with mlflow.start_run(run_name="Logistic_regression_1"):
+                mlflow.set_experiment(experiment_name="Logistic_regression")
+                with mlflow.start_run(run_name="exp_logisticRegression_"+str(random.randint(101,200))):
                         lgr = LogisticRegression()
                         lgr.fit(X_train, y_train)
                         score = lgr.score(X_test, y_test)
@@ -73,9 +74,8 @@ def model_Monitor(request):
                 
 
         if request.POST['method'] == 'decisionTrees':
-                
-                mlflow.set_experiment(experiment_name="my_exp_decisionTrees")
-                with mlflow.start_run(run_name="Decision_trees_1"):
+                mlflow.set_experiment(experiment_name="Decision_trees")
+                with mlflow.start_run(run_name="exp_decisionTrees_"+str(random.randint(201,300))):
                         mlflow.set_tags(tags)
                         dt_clf = DecisionTreeClassifier()
                         dt_clf.fit(X_train, y_train)
@@ -87,8 +87,8 @@ def model_Monitor(request):
                 
         
         if request.POST['method'] == 'randomForest':
-                mlflow.set_experiment(experiment_name="my_exp_randomForest")
-                with mlflow.start_run(run_name="Random_Forest_1"):
+                mlflow.set_experiment(experiment_name="Random_Forest")
+                with mlflow.start_run(run_name="exp_randomForest_"+str(random.randint(301,400))):
                         mlflow.set_tags(tags)
                         rf_clf = RandomForestClassifier()
                         rf_clf.fit(X_train, y_train)
@@ -99,5 +99,5 @@ def model_Monitor(request):
                         mlflow.sklearn.log_model(rf_clf, "random-forest-model")
                 
         mlflow.end_run()
-        return HttpResponseRedirect("http://localhost:5000")
+        return HttpResponseRedirect('http://localhost:5000/')
 

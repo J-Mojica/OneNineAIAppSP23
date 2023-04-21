@@ -13,3 +13,5 @@ whitenoise==5.3.0
 pandas==1.4.0
 numpy==1.21.2
 scikit-learn==1.24.2
+mlflow==2.2.2
+google==3.0.0
