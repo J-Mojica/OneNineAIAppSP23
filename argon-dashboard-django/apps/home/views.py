@@ -90,7 +90,6 @@ def dataCleaning(request):
 
 @login_required(login_url="/login/")
 def dataMerge(request):
-    # HERE GOES MLFLOW
         if request.method == 'POST':
             if request.POST['method']=='view':
                 df=pd.read_csv('./users/'+request.user.username+'/'+request.POST['fileName'],skipinitialspace=True)

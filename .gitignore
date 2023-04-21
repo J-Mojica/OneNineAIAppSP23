@@ -144,8 +144,9 @@ apps/static/assets/yarn.lock
 apps/static/assets/.temp
 
 #User Storage
-argon-dashboard-django/users
+/argon-dashboard-django/users/*
 
 # MLFlow
 mlruns/
 mlartifacts/
+
