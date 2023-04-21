@@ -27,29 +27,29 @@ def impute(request):
                 try:
                     df[col].replace(np.NaN,df[col].mean(),inplace=True)
                 except:
-                    df[col].replace(np.NaN,df[col].value_counts().index[0])
+                    df[col].replace(np.NaN,df[col].value_counts().index[0],inplace=True)
         if(request.POST['imputeMethod']=='MostFrequent'):
             for col in df:
-                df[col].replace(np.NaN,df[col].value_counts().index[0])
+                df[col].replace(np.NaN,df[col].value_counts().index[0],inplace=True)
 
     else:
         if(request.POST['imputeZero']=='Yes'): #Replace zeroes with NaNs for specific column if Yes
             try:
                 df[request.POST['feature1']].replace(0,np.NaN,inplace=True)
             except:
-                df[request.POST['feature1']].replace(np.NaN,df[request.POST['feature1']].value_counts().index[0])
+                df[request.POST['feature1']].replace(np.NaN,df[request.POST['feature1']].value_counts().index[0],inplace=True)
         if(request.POST['imputeMethod']=='Median'):
             try:
                 df[request.POST['feature1']].replace(np.NaN,df[request.POST['feature1']].median(),inplace=True)
             except:
-                df[request.POST['feature1']].replace(np.NaN,df[request.POST['feature1']].value_counts().index[0])
+                df[request.POST['feature1']].replace(np.NaN,df[request.POST['feature1']].value_counts().index[0],inplace=True)
         elif(request.POST['imputeMethod']=='Mean'):
             try:
                 df[request.POST['feature1']].replace(np.NaN,df[request.POST['feature1']].mean(),inplace=True)
             except:
-                df[request.POST['feature1']].replace(np.NaN,df[request.POST['feature1']].value_counts().index[0])
+                df[request.POST['feature1']].replace(np.NaN,df[request.POST['feature1']].value_counts().index[0],inplace=True)
         elif(request.POST['imputeMethod']=='MostFrequent'):
-                df[request.POST['feature1']].replace(np.NaN,df[request.POST['feature1']].value_counts().index[0])
+                df[request.POST['feature1']].replace(np.NaN,df[request.POST['feature1']].value_counts().index[0],inplace=True)
 
     df.to_csv('./users/'+request.user.username+'/'+request.POST['fileName'],index=False)
     return HttpResponse(df.head(200).to_html(classes='dataframe table table-striped table-bordered dataTable no-footer'))
@@ -94,6 +94,14 @@ def dropOutlier(request):
     df = df[~((df < (Q1 - 1.5 * IQR)) |(df > (Q3 + 1.5 * IQR))).any(axis=1)]
     df.to_csv('./users/'+request.user.username+'/'+request.POST['fileName'],index=False)
     return HttpResponse(df.head(200).to_html(classes='dataframe table table-striped table-bordered dataTable no-footer'))
+def replaceValue(request):
+    df=pd.read_csv('./users/'+request.user.username+'/'+request.POST['fileName'],skipinitialspace=True)
+    try:
+        df[request.POST['feature6']].replace(float(request.POST['to_replace']),float(request.POST['value']),inplace=True)
+    except:
+        df[request.POST['feature6']].replace(request.POST['to_replace'],request.POST['value'],inplace=True)
+    return HttpResponse(df.head(200).to_html(classes='dataframe table table-striped table-bordered dataTable no-footer'))
+
 #to bypass issues where we need to send multiple html things or html + other stuff
 #Maybe you could store a temp html file and then GET request it from frontend
 #Or you could append all wanted html things into one html file and parse through it in frontend

@@ -67,6 +67,8 @@ def dataCleaning(request):
             request.POST._mutable=True
             request.POST['target']=request.POST['target'].strip('\r\n') #strip trailing escape sequences if needed
             return dropCorrelated(request)
+        elif request.POST['method'] == 'replaceValue':
+            return replaceValue(request)
         elif request.POST['method'] == 'autoClean': #Since they all return an html file just ignore them,all functions save their modifications to the data regardless
             #Currently we impute by median, drop anything with 0.9 correlation and outlier removal
             #Need to input in the special attributes for each feature
@@ -90,7 +92,6 @@ def dataCleaning(request):
 
 @login_required(login_url="/login/")
 def dataMerge(request):
-    # HERE GOES MLFLOW
         if request.method == 'POST':
             if request.POST['method']=='view':
                 df=pd.read_csv('./users/'+request.user.username+'/'+request.POST['fileName'],skipinitialspace=True)

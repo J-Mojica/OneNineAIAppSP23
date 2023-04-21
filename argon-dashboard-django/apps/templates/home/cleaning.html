@@ -91,10 +91,12 @@
                     <div class="card-header">
                         <h2 class="mb-0">Input Data</h2>
                     </div>
+                    <div class="card-body">
                     <form id="datasetUpload" enctype="multipart/form-data" method="post"> {% csrf_token %}
                         <input type="file" id="fileUpload" />
                         <input type="submit" value="Upload" id="upload" />
                     </form>
+                    </div>
                     <div id="backendDatasets" class="card">
                         <div class="card-body">
                              Or select a dataset previously stored on our server:
@@ -105,10 +107,10 @@
                     <div class="card" id="dvCSV">
                     </div>						
                     <div class="card">
-                        <div class="card-header" id="automatedCleanupHead" data-toggle="collapse" data-target="#collapseAutomatedCleanup" aria-expanded="false" aria-controls="collapseAutomatedCleanup">
+                        <div class="card-header" id="automatedCleanupHead">
                             <h3 class="mb-0">Automated Cleanup</h3>
                         </div>
-                        <div id="collapseAutomatedCleanup" class="collapse" >
+                        <div id="collapseAutomatedCleanup"  >
                             <div class="card-body">
                                     <p class="card-text mb-2">
                                         Transforming you dataset can be a hard task for beginners and people not Familiar with data science. 
@@ -700,6 +702,7 @@
                                                                         enctype="multipart/form-data"
                                                                         id="replaceValueForm"
                                                                     >
+                                                                    <input type="hidden" name="method" value="replaceValue">
                                                                         {% csrf_token %}
                                                                         <div id="manualSelectCol">
                                                                             <label for="replaceColumn"
@@ -709,16 +712,10 @@
                                                                             <select
                                                                                 data-placeholder="Choose column"
                                                                                 class="select form-control chosen-select"
-                                                                                name="replaceColumn"
-                                                                                id="replaceColumn"
+                                                                                name="feature6"
+                                                                                id="feature6"
                                                                                 required
-                                                                            >
-                                                                                <!-- <option value="all" selected>Select All</option> -->
-                                                                                {% for col in categorical_features %}
-                                                                                <option value="{{ col }}">
-                                                                                    {{ col }}
-                                                                                </option>
-                                                                                {% endfor %}
+                                                                            >                                                                                
                                                                             </select>
                                                                         </div>
                                                                         <br />
@@ -1121,7 +1118,7 @@
 <script type="text/javascript">
     let fileName='';
     let Columns=[];
-    const featuresImplemented=5;
+    const featuresImplemented=6;
     
     $(function () 
     {
@@ -1236,6 +1233,18 @@
                             var row = $("<tr />");
                             var cells = rows[i].split(",");
                             if (cells.length > 1) {
+                                if(i==0)
+                                {
+                                    var cell = $("<td />");
+                                    cell.html(" ");
+                                    row.append(cell);
+                                }
+                                else if(i>0)
+                                {
+                                    var cell = $("<td />");
+                                    cell.html(i-1);
+                                    row.append(cell);
+                                }
                                 for (var j = 0; j < cells.length; j++) 
                                 {
                                     var cell = $("<td />");
@@ -1246,7 +1255,7 @@
                                 }
                                 table.append(row);
                             }
-                            if(i==300)
+                            if(i==200)
                                 break;
                         }
                         $("#dvCSV").html('');
@@ -1374,6 +1383,27 @@
 
         $("#arbitraryImputerForm").submit(function(event){
             var fd = new FormData(document.querySelector('#arbitraryImputerForm'))
+            fd.append('fileName',fileName);
+            console.log(fd);
+            event.preventDefault();
+            //console.log(document.querySelector('#Impute'))
+
+            $.ajax({
+            type: "POST",
+            url: "",
+            data: fd,
+            contentType: false,
+            processData: false,
+            enctype: 'multipart/form-data'
+            }).done(function (data) {
+                $("#dvCSV").html('');
+                $("#dvCSV").append(data);
+            }); 
+            event.preventDefault();
+        });
+
+        $("#replaceValueForm").submit(function(event){
+            var fd = new FormData(document.querySelector('#replaceValueForm'))
             fd.append('fileName',fileName);
             console.log(fd);
             event.preventDefault();
