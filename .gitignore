@@ -145,3 +145,7 @@ apps/static/assets/.temp
 
 #User Storage
 argon-dashboard-django/users
+
+# MLFlow
+mlruns/
+mlartifacts/

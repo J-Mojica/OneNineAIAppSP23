@@ -31,6 +31,13 @@
               <span class="nav-link-text">Data Cleaning</span>
             </a>
           </li>
+        <!-- Data Merging nav item -->
+          <li class="nav-item">
+            <a class="nav-link {% if 'cleaning' in segment %} active {% endif %}" href="{% url 'dataMerge' %}">
+              <i class="ni ni-folder-17 text-orange"></i>
+              <span class="nav-link-text">Data Merging</span>
+            </a>
+          </li>
         <!-- Model Monitoring nav item -->
           <li class="nav-item">
             <a class="nav-link {% if 'monitoring' in segment %} active {% endif %}" href="{% url 'modelMonitoring' %}">

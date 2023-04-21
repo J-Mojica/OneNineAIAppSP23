@@ -1,0 +1,522 @@
+{% extends 'layouts/base.html' %} {% block title %} Data Cleaning {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}
+<style>
+    .container {
+        width: 600px;
+        /* height:150px; */
+        margin: auto;
+    }
+    .progressbar {
+        counter-reset: step;
+        width: 100%;
+    }
+    .progressbar li {
+        list-style-type: none;
+        width: 20%;
+        float: left;
+        font-size: 12px;
+        position: relative;
+        text-align: center;
+        text-transform: uppercase;
+        color: #7d7d7d;
+    }
+    .progressbar li:before {
+        width: 30px;
+        height: 30px;
+        content: counter(step);
+        counter-increment: step;
+        line-height: 30px;
+        border: 2px solid #7d7d7d;
+        display: block;
+        text-align: center;
+        margin: 0 auto 10px auto;
+        border-radius: 50%;
+        background-color: white;
+    }
+    .progressbar li:after {
+        width: 100%;
+        height: 2px;
+        content: "";
+        position: absolute;
+        background-color: #7d7d7d;
+        top: 15px;
+        left: -50%;
+        z-index: -1;
+    }
+    .progressbar li:first-child:after {
+        content: none;
+    }
+    .progressbar li.active {
+        color: green;
+    }
+    .progressbar li.active:before {
+        border-color: #55b776;
+    }
+    .progressbar li.active + li:after {
+        background-color: #55b776;
+    }
+    table{
+   overflow-y:scroll;
+   height:500px;
+   display:inline-block;
+}
+</style>
+{% endblock stylesheets %} {% block content %}
+
+<!-- Header -->
+<div class="header bg-gradient-primary pb-8 pt-5">
+    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4" style="width: max-content">
+        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+            <li class="breadcrumb-item">
+                <a href="/"><i class="fas fa-home"></i></a>
+            </li>
+            <li class="breadcrumb-item"><a href="/create/">AI Project</a></li>
+            <li class="breadcrumb-item"><a href="#">{{ projectName }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Transform Data</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="container-fluid mt--7">
+    <div class="row">
+        <div class="col">
+            <div class="card shadow">
+                
+
+                <div class="m-5" id="transformerGroup">
+                    {% comment %} start {% endcomment %}
+                    <!-- START UPLOAD DATA -->
+                    <div class="card-header">
+                        <h2 class="mb-0">Input Data</h2>
+                    </div>
+                    <form id="datasetUpload" enctype="multipart/form-data" method="post"> {% csrf_token %}
+                        <input type="file" id="fileUpload" />
+                        <input type="submit" value="Upload" id="upload" />
+                    </form>
+                    <div class="card" id="dvCSV">
+                    </div>	
+                    <div id="backendDatasets" class="card">
+                        <div class="card-body">
+                             Select a dataset previously stored on our server to merge:
+                            <select id="dataSets" > <option value="" hidden selected>Select a dataset</option> </select>
+                        </div>
+                    </div>
+                    <!-- END UPLOAD DATA -->
+                    					
+                    <div class="card" id="dvCSV2">
+                    </div>	
+                    {% comment %} end {% endcomment %}
+                    <div class="card-header">
+                        <h2 class="mb-0">Append</h2>
+                    </div>
+                    <div class="card-body">
+                    <form id="append" enctype="multipart/form-data" method="post"> {% csrf_token %}
+                        Append the uploaded dataset to the selected dataset (must have matching columns):
+                        <input type="hidden" name="method" value="append">
+                        <input type="submit" value="Append" class="btn btn-primary btn-sm"  />
+                    </form>
+                    </div>                    
+                    <br>
+
+
+                    <div class="card-header">
+                        <h2 class="mb-0">Merge</h2>
+                    </div>
+                    <div class="card-body">
+                    <form id="merge" enctype="multipart/form-data" method="post"> {% csrf_token %}
+                        Select merge type:
+                        <input type="hidden" name="method" value="merge">
+                        <div class="custom-control custom-radio custom-control-inline mb-3">
+                            <input name="mergeType" id="innerJoin" class="custom-control-input" value="inner" type="radio">
+                            <label class="custom-control-label" for="innerJoin">
+                                <img src="/static/assets/img/brand/img_innerjoin.png">
+                            </label>
+                        </div>
+                      
+                        <div class="custom-control custom-radio custom-control-inline mb-3">
+                            <input name="mergeType" id="leftJoin" class="custom-control-input" value="left" type="radio">
+                            <label class="custom-control-label" for="leftJoin">
+                                <img src="/static/assets/img/brand/img_leftjoin.png">
+                            </label>
+                        </div>
+                        
+                        <div class="custom-control custom-radio custom-control-inline mb-3">
+                            <input name="mergeType" id="rightJoin" class="custom-control-input" value="right" type="radio">
+                            <label class="custom-control-label" for="rightJoin">
+                                <img src="/static/assets/img/brand/img_rightjoin.png">
+                            </label>
+                        </div>
+                        
+                        <div class="custom-control custom-radio custom-control-inline mb-3">
+                            <input name="mergeType" id="outer" class="custom-control-input" value="outer" type="radio">
+                            <label class="custom-control-label" for="outer">
+                                <img src="/static/assets/img/brand/img_fulljoin.png">
+                            </label>
+                        </div>
+                        <br><br><br><br><br>
+                        Select the merge key for the uploaded dataset:
+                        <select name="feature1" id="feature1">
+                        </select>
+                        <br>
+                        Select the merge key for the selected stored dataset:
+                        <select name="feature2" id="feature2">                        
+                        </select>
+                        <br>
+                        <input type="submit" value="Merge" class="btn btn-primary btn-sm"  />
+                        
+
+                    </form>
+                    </div>
+                    {% comment %}
+                    <h2 style="padding-bottom: 20px">Select the transformer you want to use and then click Next</h2>
+                    {% endcomment %}
+
+                    
+
+                    <!-- Add later!
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="card-title">Transformers Applied</h2>
+                            <div style="width:100%; overflow:auto;">
+                                <div>{{ tables |safe }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    -->
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-12">
+                                <div class="row">
+                                    <div class="col-lg-4"></div>
+                                    <div class="col-lg-4">
+                                        <!-- <div class="card card-lift--hover  h-100 bg-white" style="border-radius:25px; width:120%"> -->
+                                      
+                                        <!-- </div> -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE -->
+{% block javascripts %}
+<script>
+    const uploadBtn = document.getElementById("uploadBtn")
+    uploadBtn.addEventListener('click', () => {
+        console.log("Pene")
+        const file = document.getElementById("file")
+        console.log(file.files[0].name)
+    })
+</script>
+
+<script src="/static/assets/vendor/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+
+<script>
+    $("#my_table").DataTable({
+        pageLength: 5,
+        "ordering": false,
+        language: {
+            "paginate": {
+              "previous": "<<",
+              "next":">>"
+            }
+          }
+    });
+</script>
+
+<script>
+    $("#sample_table").DataTable({
+        pageLength: 5,
+        language: {
+            "paginate": {
+              "previous": "<<",
+              "next":">>"
+            }
+          }
+    });
+</script>
+
+<script>
+    $("#submitBtnLoader").on("click", function () {
+        showLoader();
+    });
+
+    function showLoader() {
+        $("#submitBtnLoader").hide();
+        // $('#submitBtnLoaderParent').append('<div style="" id="loadingDiv"><div class="loader">Loading...</div></div>');
+        $("#submitBtnLoaderParent").append(
+            '<button type="submit" class="btn btn-primary btn-lg btn-block" name="next" form="next" value="next" id="submitBtnLoader" disabled><span class="spinner"></span>Loading...</button>'
+        );
+        // console.log('Came here')
+    }
+</script>
+
+<script>
+    function yesnoCheck(that) {
+        if (that.value == "constant") {
+            document.getElementById("ifYes").style.display = "block";
+        } else {
+            document.getElementById("ifYes").style.display = "none";
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    let fileName='';
+    let fileName2='';
+    let Columns=[];
+    let Columns2=[];
+    const featuresImplemented=1;
+    
+    $(function () 
+    {
+        
+        function getCookie(name) 
+        {
+            var cookieValue = null;
+            if (document.cookie && document.cookie != '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        
+        var csrftoken = getCookie('csrftoken');
+        //Post request to get the dataset names
+        var fd = new FormData();
+        fd.append('csrfmiddlewaretoken',csrftoken);
+        $.ajax({
+        type: "POST",
+        url: "getDataset",
+        data: fd,
+        contentType: false,
+        processData: false,
+        enctype: 'multipart/form-data'
+        }).done(function (data) {
+            var select = document.getElementById("dataSets");         
+            for(dataset in data['dataSets']) 
+                {            
+                    //List all datasets stored on our backend.
+                    select.options[select.options.length] = new Option(data['dataSets'][dataset], data['dataSets'][dataset]);  
+                }
+        });
+
+        //When the user selects a dataset from our backend update the filename and display a preview of that dataset
+        $("#dataSets").change(function()
+        {
+            fileName2=$("#dataSets").val();
+            var fd = new FormData();
+            fd.append('csrfmiddlewaretoken',csrftoken);
+            fd.append('fileName', fileName2);
+            fd.append('method','view');
+            $.ajax({
+            type: "POST",
+            url: "",
+            data: fd,
+            contentType: false,
+            processData: false,
+            enctype: 'multipart/form-data'
+            }).done(function (data) {
+                $("#dvCSV2").html('');
+                $("#dvCSV2").append(data);
+                var fd = new FormData();
+                fd.append('csrfmiddlewaretoken',csrftoken);
+                fd.append('fileName', fileName2);
+                $.ajax({
+                    type: "POST",
+                    url: "getDatasetCols",
+                    data: fd,
+                    contentType: false,
+                    processData: false,
+                    enctype: 'multipart/form-data'
+                }).done(function(data){
+                    $('#feature2').empty();
+                    var select = document.getElementById("feature2"); 
+                    Columns2=data['cols']        
+                    for(cols in data['cols']) 
+                        {            
+                            //List all datasets stored on our backend.
+                            select.options[select.options.length] = new Option(data['cols'][cols], data['cols'][cols]);  
+                        }
+                });
+            });
+
+        });
+        
+        //Upload dataset to backend
+        $("#upload").bind("click", function () 
+        {
+            
+            var regex = /^([a-zA-Z0-9\s_\\.\-:\(\)])+(.csv|.txt)$/;
+            if (regex.test($("#fileUpload").val().toLowerCase())) 
+            {
+                if (typeof (FileReader) != "undefined") 
+                {
+                    var reader = new FileReader();
+                    reader.onload = function (e) 
+                    {
+                        var table = $("<table class='dataframe table table-striped table-bordered dataTable no-footer'>");
+                        e.target.result=e.target.result.replace("(\r\n|\r|\n)","\n")
+                        var rows = e.target.result.split("\n"); //Might need to update this since linebreaks can be \r\n;
+                        for (var i = 0; i < rows.length; i++) 
+                        {
+                            var row = $("<tr />");
+                            var cells = rows[i].split(",");
+                            if (cells.length > 1) {
+                                for (var j = 0; j < cells.length; j++) 
+                                {
+                                    var cell = $("<td />");
+                                    cell.html(cells[j]);
+                                    if(i==0) //Grabs the variable names;
+                                        Columns.push(cells[j]);
+                                    row.append(cell);
+                                }
+                                table.append(row);
+                            }
+                            if(i==300)
+                                break;
+                        }
+                        Columns[Columns.length-1] = Columns[Columns.length-1].replace(/[\n\r]/g,'')
+                        $("#upload").attr("disabled", true);
+                        $("#dvCSV").html('');
+                        $("#dvCSV").append(table);
+                        $('#feature1').empty();
+                            var select = document.getElementById("feature1");
+                            
+                            for(index in Columns) 
+                            {
+                
+                                select.options[select.options.length] = new Option(Columns[index], Columns[index]);
+                            }
+                    }
+                    reader.readAsText($("#fileUpload")[0].files[0]);
+                    fileName=$("#fileUpload")[0].files[0].name;
+                    document.getElementById("datasetNameset").value = fileName;
+                    //const blob = new Blob([$("#fileUpload")[0].files[0]], { type: 'text/csv' });
+                    
+                } 
+                else 
+                {
+                    alert("This browser does not support HTML5.");
+                }
+            } 
+            else 
+            {
+                alert("Please upload a valid CSV file.");
+            }
+        });
+        //Show dataset on upload.
+        $("#datasetUpload").submit(function (event) 
+        {
+            
+            var fd = new FormData();
+            fd.append('csrfmiddlewaretoken',csrftoken);
+            fd.append('fileUpload', $("#fileUpload")[0].files[0]);
+            $.ajax({
+            type: "POST",
+            url: "upload",
+            data: fd,
+            contentType: false,
+            processData: false,
+            enctype: 'multipart/form-data'
+            }).done(function (data) {
+            console.log(fd);
+
+            });
+
+            event.preventDefault();
+        });
+
+        $("#append").submit(function(event)
+        {
+            event.preventDefault();
+            if(Columns.length!==Columns2.length)
+            {
+                alert("Datasets must have matching columns!");
+            }
+            let result = false;
+
+            // comparing each element of array 
+            for (let i = 0; i < Columns.length; i++) 
+            {
+
+                if (Columns[i] !== Columns2[i]) 
+                {
+                    return false;
+                    break;
+                } 
+                else 
+                {
+                    result = true;
+                }
+            }
+            if(!result)
+            {
+                alert("Datasets must have matching columns!");
+            }
+            else
+            {
+                var fd = new FormData(document.querySelector('#append'))
+                fd.append('fileName',fileName);
+                fd.append('fileName2',fileName2);
+                console.log(fd);
+                event.preventDefault();
+                $.ajax({
+                type: "POST",
+                url: "",
+                data: fd,
+                contentType: false,
+                processData: false,
+                enctype: 'multipart/form-data'
+                }).done(function (data) {
+                    $("#dvCSV").html('');
+                    $("#dvCSV").append(data);
+                }); 
+            }
+            
+        });
+
+        $("#merge").submit(function(event)
+        {
+            var fd = new FormData(document.querySelector('#merge'))
+            fd.append('fileName',fileName);
+            fd.append('fileName2',fileName2);
+            console.log(fd);
+            event.preventDefault();
+            $.ajax({
+            type: "POST",
+            url: "",
+            data: fd,
+            contentType: false,
+            processData: false,
+            enctype: 'multipart/form-data'
+            }).done(function (data) {
+                $("#dvCSV").html('');
+                $("#dvCSV").append(data);
+            }); 
+            event.preventDefault();
+
+        });
+
+    
+    });
+
+</script>
+{% endblock javascripts %}

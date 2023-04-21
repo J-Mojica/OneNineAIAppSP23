@@ -1,1 +1,403 @@
 {% extends 'layouts/base.html' %} {% block title %} Use Cases {% endblock title %}
+
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}
+<style>
+    .useImage{
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 4px;
+    }
+    .container {
+        width: 600px;
+        /* height:150px; */
+        margin: auto;
+    }
+    .progressbar {
+        counter-reset: step;
+        width: 100%;
+    }
+    .progressbar li {
+        list-style-type: none;
+        width: 20%;
+        float: left;
+        font-size: 12px;
+        position: relative;
+        text-align: center;
+        text-transform: uppercase;
+        color: #7d7d7d;
+    }
+    .progressbar li:before {
+        width: 30px;
+        height: 30px;
+        content: counter(step);
+        counter-increment: step;
+        line-height: 30px;
+        border: 2px solid #7d7d7d;
+        display: block;
+        text-align: center;
+        margin: 0 auto 10px auto;
+        border-radius: 50%;
+        background-color: white;
+    }
+    .progressbar li:after {
+        width: 100%;
+        height: 2px;
+        content: "";
+        position: absolute;
+        background-color: #7d7d7d;
+        top: 15px;
+        left: -50%;
+        z-index: -1;
+    }
+    .progressbar li:first-child:after {
+        content: none;
+    }
+    .progressbar li.active {
+        color: green;
+    }
+    .progressbar li.active:before {
+        border-color: #55b776;
+    }
+    .progressbar li.active + li:after {
+        background-color: #55b776;
+    }
+</style>
+{% endblock stylesheets %} 
+
+{% block content %}
+
+<div class="card">
+  <!-- Card header -->
+  <div class="card-header">
+    <h3 class="mb-0">OneNine AI Application Use Cases</h3>
+  </div>
+  <!-- Card body -->
+  <div class="card-body">
+    <div class="row">
+
+        <!--Use case 1-->
+          <div class="col-xl-6 col-md-6">
+            <div class="card card-stats">
+              <div class="card-body row h-100">
+                <!-- Left section-->
+                <div class="col-6">
+                    <h4> AirBnB Prices </h4>
+                
+                    <p> 
+                        AirBnB prices can fluctuate based on a number of different factors such as
+                        location, time of year, and number of guests, number of rooms, etc.
+                        An AI model that is able to predict the price of an AirBnB listing based 
+                        on such characteristic can be helpful for hosts to check that the price of 
+                        their listing is competitive and for guests to find the best price for their
+                        stay. We approach this problem by using linear regression to model 
+                        the prices.
+                    </p>
+                    <a class="fst-italic" href="https://www.kaggle.com/datasets/thedevastator/airbnb-prices-in-european-cities?resource=download"> 
+                        Dataset
+                    </a>
+                <hr/>
+                    <h4> Results </h4>
+                        <p> Root Mean Square Error of $248.73 </p>
+                       <a class="d-flex align-items-center" href="https://youtu.be/KldkoXOzzD4">
+                        <span class="fst-italic"> View Video </span>
+
+                       <i class="ni ni-bold-right text-primary ms-2"></i> 
+                       </a>
+                </div>
+                <!-- Right section-->
+                <div class="col-6 bg-secondary">
+                    <img class="useImage" src="/static/assets/img/useCases/airBnBLaptop.webp"> </img>
+                </div>
+              </div>
+            </div>
+        </div>
+        <!--End Use case 1-->
+
+        <!--Use case 2-->
+        <div class="col-xl-6 col-md-6">
+            <div class="card card-stats">
+              <div class="card-body row h-100">
+                <!-- Left section-->
+                <div class="col-6">
+                    <h4> Hotel Reservations Cancellations </h4>
+                
+                    <p> 
+                        A significant number of hotel 
+                        reservations are called-off due to cancellations or no-shows.  
+                        Cancellations often are made free of charge or
+                        at a low cost which is revenue-diminishing factor for hotels to deal with. Hence,
+                        it is important to predict whether a reservation will be cancelled or not.
+                        For this purpose we implement a random forest classifier to predict the
+                        cancellation status of a reservation.
+                    </p>
+                    <a class="fst-italic" href="https://www.kaggle.com/datasets/ahsan81/hotel-reservations-classification-dataset"> 
+                        Dataset
+                    </a>
+                <hr/>
+                    <h4> Results </h4>
+                        <p> 82.6% Accuracy </p>
+                       <a class="d-flex align-items-center" href="https://youtu.be/IHdy2r9o_aA">
+                        <span class="fst-italic"> View Video </span>
+
+                       <i class="ni ni-bold-right text-primary ms-2"></i> 
+                       </a>
+                </div>
+                <!-- Right section-->
+                <div class="col-6 bg-secondary">
+                    <img class="useImage" src="/static/assets/img/useCases/hotelReservations.webp"> </img>
+                </div>
+              </div>
+            </div>
+        </div>
+        <!--End Use case 2-->
+        
+        <!--Use case 3-->
+          <div class="col-xl-6 col-md-6">
+            <div class="card card-stats">
+              <div class="card-body row h-100">
+                <!-- Left section-->
+                <div class="col-6">
+                    <h4> Diabetes Diagnosis </h4>
+                    <p> 
+                        We can use the Pima Indians Diabetes dataset to train a model able to predict whether 
+                        a patient has diabetes or not based on a number of different factors. For this,
+                        we can use one of the classification algorithms available on the application.
+                    </p>
+                    <a class="fst-italic" href="https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database/discussion"> 
+                        Dataset
+                    </a>
+                <hr/>
+                    <h4> Results </h4>
+                    <p> 
+                        75.6% Accuracy
+                    </p>
+                    <a class="d-flex align-items-center" href="https://www.youtube.com/watch?v=u3GouSk7wJo">
+                        <span class="fst-italic"> View Video </span>
+                        <i class="ni ni-bold-right text-primary ms-2"></i> 
+                    </a>
+                </div>
+                <!-- Right section-->
+                <div class="col-6 bg-secondary">
+                    <img class="useImage" src="/static/assets/img/useCases/diabetes.webp"> </img>
+                </div>
+              </div>
+            </div>
+        </div>
+        <!--End Use case 3-->
+
+        
+        <!--Use case 4-->
+          <div class="col-xl-6 col-md-6">
+            <div class="card card-stats">
+              <div class="card-body row h-100">
+                <!-- Left section-->
+                <div class="col-6">
+                    <h4> Heart Attack Risk </h4>
+                    <p> 
+                        World Health Organization has estimated 12 million deaths occur worldwide, every year due to Heart diseases.
+                        The early prognosis of cardiovascular diseases can aid in making decisions on lifestyle changes in high risk patients and in turn reduce the complications.
+                        We can use a classification algorithm to model the risk of a patient having a heart attack.
+                    </p>
+                    <a class="fst-italic" href="https://www.kaggle.com/datasets/naveengowda16/logistic-regression-heart-disease-prediction"> 
+                        Dataset
+                    </a>
+                <hr/>
+                    <h4> Results </h4>
+                    <p> 
+                        85% accuracy
+                    </p>
+                    <a class="d-flex align-items-center" href="https://www.youtube.com/watch?v=FGslzoe9sEU">
+                        <span class="fst-italic"> View Video </span>
+                        <i class="ni ni-bold-right text-primary ms-2"></i> 
+                    </a>
+                </div>
+                <!-- Right section-->
+                <div class="col-6 bg-secondary">
+                    <img class="useImage" src="/static/assets/img/useCases/heartAttacks.webp"> </img>
+                </div>
+              </div>
+            </div>
+        </div>
+        <!--End Use case 4-->
+
+        <!--Use case 5-->
+        <div class="col-xl-6 col-md-6">
+            <div class="card card-stats">
+              <div class="card-body row h-100">
+                <!-- Left section-->
+                <div class="col-6">
+                    <h4> Insurance Bills </h4>
+                    <p> 
+                        One of the most common applications of artificial intelligence
+                        in the insurance industry is using regression models to predict
+                        insurance bills. By using the historical data of factors like age, gender, bmi, etc, 
+                        we can train an AI model to predict the cost of an individual's medical costs billed by health insurance
+                    </p>
+                    <a class="fst-italic" href="https://www.kaggle.com/datasets/mirichoi0218/insurance"> 
+                        Dataset
+                    </a>
+                <hr/>
+                    <h4> Results </h4>
+                    <p> 
+                        R-squared coeffiecient of 0.79
+                    </p>
+                    <a class="d-flex align-items-center" href="https://www.youtube.com/watch?v=uR7JZbFWo8U">
+                        <span class="fst-italic"> View Video </span>
+                        <i class="ni ni-bold-right text-primary ms-2"></i> 
+                    </a>
+                </div>
+                <!-- Right section-->
+                <div class="col-6 bg-secondary">
+                    <img class="useImage" src="/static/assets/img/useCases/healthInsurance.webp"> </img>
+                </div>
+              </div>
+            </div>
+        </div>
+        <!--End Use case 5-->
+
+          <!--Use case 6-->
+          <div class="col-xl-6 col-md-6">
+            <div class="card card-stats">
+                <div class="card-body row h-100">
+                <!-- Left section-->
+                <div class="col-6">
+                    <h4> Loan Default </h4>
+                    <p> 
+                        It is in the best interest for both financial institutions and borrowers to be able to predict
+                        whether a person will default on their loan. This task can be accomplished using a classification algorithm.
+                        We use a dataset with more than 67k records to predict a borrowers' loan grade.
+                    </p>
+                    <a class="fst-italic" href="https://www.kaggle.com/datasets/hemanthsai7/loandefault"> 
+                        Dataset
+                    </a>
+                    <hr/>
+                    <h4> Results </h4>
+                    <p> 
+                        [RESULTS MISSING FOR THIS ONE]
+                    </p>
+                    <a class="d-flex align-items-center" href="https://youtu.be/V9w0ZTexeE0">
+                        <span class="fst-italic"> View Video </span>
+                        <i class="ni ni-bold-right text-primary ms-2"></i> 
+                    </a>
+                </div>
+                <!-- Right section-->
+                <div class="col-6 bg-secondary">
+                    <img class="useImage" src="/static/assets/img/useCases/loanDefault.webp"> </img>
+                </div>
+                </div>
+            </div>
+        </div>
+        <!--End Use case 6-->
+
+          <!--Use case 7-->
+          <div class="col-xl-6 col-md-6">
+            <div class="card card-stats">
+              <div class="card-body row h-100">
+                <!-- Left section-->
+                <div class="col-6">
+                    <h4> Credit Card Fraud </h4>
+                    <p> 
+                        Credit card fraud is a major problem for both credit card issuers 
+                        and consumers alike, and one way that the industry is combating 
+                        this problem is through the use of classification algorithms.
+                        This allows credit card companies to quickly 
+                        identify and flag potentially fraudulent transactions.
+                    </p>
+                    <a class="fst-italic" href="https://www.kaggle.com/datasets/dhanushnarayananr/credit-card-fraud"> 
+                        Dataset
+                    </a>
+                <hr/>
+                    <h4> Results </h4>
+                    <p> 
+                        [RESULTS MISSING FOR THIS ONE]
+                    </p>
+                    <a class="d-flex align-items-center" href="https://youtu.be/V9w0ZTexeE0">
+                        <span class="fst-italic"> View Video </span>
+                        <i class="ni ni-bold-right text-primary ms-2"></i> 
+                    </a>
+                </div>
+                <!-- Right section-->
+                <div class="col-6 bg-secondary">
+                    <img class="useImage" src="/static/assets/img/useCases/creditCard.webp"> </img>
+                </div>
+              </div>
+            </div>
+        </div>
+        <!--End Use case 7-->
+
+        <!--Use case 8-->
+        <div class="col-xl-6 col-md-6">
+            <div class="card card-stats">
+              <div class="card-body row h-100">
+                <!-- Left section-->
+                <div class="col-6">
+                    <h4> Car Prices </h4>
+                    <p> 
+                        Often, car prices can be hard to predict as there are many features to take
+                        into account such as brand name, number of doors, car model, etc.
+                        To approach this problem we can use a regression algorithm to predict the price
+                        based on these car features.
+                    </p>
+                    <a class="fst-italic" href="https://www.kaggle.com/datasets/hellbuoy/car-price-prediction"> 
+                        Dataset
+                    </a>
+                <hr/>
+                    <h4> Results </h4>
+                    <p> 
+                        R-squared coeffiecient of 0.9
+                    </p>
+                    <a class="d-flex align-items-center" href="https://www.youtube.com/watch?v=Tup8lakRUu4">
+                        <span class="fst-italic"> View Video </span>
+                        <i class="ni ni-bold-right text-primary ms-2"></i> 
+                    </a>
+                </div>
+                <!-- Right section-->
+                <div class="col-6 bg-secondary">
+                    <img class="useImage" src="/static/assets/img/useCases/carPrices.webp"> </img>
+                </div>
+              </div>
+            </div>
+        </div>
+        <!--End Use case 8-->
+
+        <!--Use case 9-->
+        <div class="col-xl-6 col-md-6">
+            <div class="card card-stats">
+              <div class="card-body row h-100">
+                <!-- Left section-->
+                <div class="col-6">
+                    <h4> College Acceptance </h4>
+                    <p> 
+                        Both universities and applicants may be interested in predicting the chances 
+                        of getting into a particular school using past admissions data. 
+                        We use Linear Regression to predict an applicant's chance of being 
+                        accepted to a university's graduate program based on factors such as 
+                        academic profile, universtiy rating, among others.
+                    </p>
+                    <a class="fst-italic" href="https://www.kaggle.com/datasets/mohansacharya/graduate-admissions"> 
+                        Dataset
+                    </a>
+                <hr/>
+                    <h4> Results </h4>
+                    <p> 
+                        Root Mean Square Error of 0.058
+                    </p>
+                    <a class="d-flex align-items-center" href="https://youtu.be/V9w0ZTexeE0">
+                        <span class="fst-italic"> View Video </span>
+                        <i class="ni ni-bold-right text-primary ms-2"></i> 
+                    </a>
+                </div>
+                <!-- Right section-->
+                <div class="col-6 bg-secondary">
+                    <img class="useImage" src="/static/assets/img/useCases/collegeAcceptance.webp"> </img>
+                </div>
+              </div>
+            </div>
+        </div>
+        <!--End Use case 9-->
+    </div>
+</div>
+{% endblock content %} 

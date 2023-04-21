@@ -1,1 +1,1239 @@
 {% extends 'layouts/base.html' %} {% block title %} Create a New AI Model {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}
+<style>
+    .container {
+        width: 600px;
+        /* height:150px; */
+        margin: auto;
+    }
+    .progressbar {
+        counter-reset: step;
+        width: 100%;
+    }
+    .progressbar li {
+        list-style-type: none;
+        width: 20%;
+        float: left;
+        font-size: 12px;
+        position: relative;
+        text-align: center;
+        text-transform: uppercase;
+        color: #7d7d7d;
+    }
+    .progressbar li:before {
+        width: 30px;
+        height: 30px;
+        content: counter(step);
+        counter-increment: step;
+        line-height: 30px;
+        border: 2px solid #7d7d7d;
+        display: block;
+        text-align: center;
+        margin: 0 auto 10px auto;
+        border-radius: 50%;
+        background-color: white;
+    }
+    .progressbar li:after {
+        width: 100%;
+        height: 2px;
+        content: "";
+        position: absolute;
+        background-color: #7d7d7d;
+        top: 15px;
+        left: -50%;
+        z-index: -1;
+    }
+    .progressbar li:first-child:after {
+        content: none;
+    }
+    .progressbar li.active {
+        color: green;
+    }
+    .progressbar li.active:before {
+        border-color: #55b776;
+    }
+    .progressbar li.active + li:after {
+        background-color: #55b776;
+    }
+    table{
+   overflow-y:scroll;
+   height:500px;
+   display:inline-block;
+}
+</style>
+{% endblock stylesheets %} {% block content %}
+
+<!-- Header -->
+<div class="header bg-gradient-primary pb-8 pt-5">
+    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4" style="width: max-content">
+        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+            <li class="breadcrumb-item">
+                <a href="/"><i class="fas fa-home"></i></a>
+            </li>
+            <li class="breadcrumb-item"><a href="/create/">AI Project</a></li>
+            <li class="breadcrumb-item"><a href="#">{{ projectName }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Create Model</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="container-fluid mt--7">
+    <div class="row">
+        <div class="col">
+            <div class="card shadow">
+                
+
+                <div class="m-5" id="transformerGroup">
+                    {% comment %} start {% endcomment %}
+                    <!-- START UPLOAD DATA -->
+                    <div class="card-header">
+                        <h2 class="mb-0">Input Data</h2>
+                    </div>
+                    <form id="datasetUpload" enctype="multipart/form-data" method="post"> {% csrf_token %}
+                        <input type="file" id="fileUpload" />
+                        <input type="submit" value="Upload" id="upload" />
+                    </form>
+                    <div id="backendDatasets" class="card">
+                        <div class="card-body">
+                             Or select a dataset previously stored on our server:
+                            <select id="dataSets" > <option value="">Select a dataset</option> </select>
+                        </div>
+                    </div>
+                    <!-- END UPLOAD DATA -->
+                    <div class="card" id="dvCSV">
+
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="mb-0">Create New Model</h2>
+                        </div>
+
+                        <div class="card-body">
+                            <p class="card-text mb-2">
+                                Create a model to predict the target feature
+                            </p>
+                        </div>
+                    </div>
+                    <div class="nav-wrapper">
+                        <ul class="nav nav-pills nav-fill flex-column flex-md-row" id="tabs-icons-text" role="tablist">
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link mb-sm-3 mb-md-0 active"
+                                    id="tabs-icons-text-2-tab"
+                                    data-toggle="tab"
+                                    href="#tabs-icons-text-2"
+                                    role="tab"
+                                    aria-controls="tabs-icons-text-2"
+                                    aria-selected="false"
+                                    ><i class="ni ni-check-bold mr-2"></i>Feature Selection</a
+                                >
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card shadow">
+                        <div class="card-body">
+                            <div class="tab-content" id="myTabContent">
+                                <div
+                                    class="tab-pane fade show active"
+                                    id="tabs-icons-text-1"
+                                    role="tabpanel"
+                                    aria-labelledby="tabs-icons-text-1-tab"
+                                >
+                                    <div class="card-body">
+                                        <div class="row mb-1 pb-1">
+                                            <!-- Button trigger modal -->
+                                            <div class="col-lg-4">
+                                                <div
+                                                    class="card h-100 bg-primary"
+                                                    style="border-radius: 25px; height: 5px"
+                                                >
+                                                    <div class="card-body pt-3 pb-1">
+                                                        <h5 class="h3 text-uppercase text-secondary">
+                                                            Select Model Parameters
+                                                        </h5>
+                                                        <p class="text-secondary">
+                                                            <small
+                                                                >Select the type of model you would like to use and which data to predict</small
+                                                            >
+                                                        </p>
+                                                        <button
+                                                            class="btn btn-sm btn-secondary"
+                                                            data-toggle="modal"
+                                                            data-target="#exampleModal1"
+                                                            data-placement="bottom"
+                                                        >
+                                                            Select
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Modal -->
+                                            <div
+                                                class="modal fade"
+                                                id="exampleModal1"
+                                                tabindex="-1"
+                                                role="dialog"
+                                                aria-labelledby="exampleModalLabel"
+                                                aria-hidden="true"
+                                            >
+                                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLabel">
+                                                                Select Model Parameters
+                                                            </h5>
+                                                            <button
+                                                                type="button"
+                                                                class="close"
+                                                                data-dismiss="modal"
+                                                                aria-label="Close"
+                                                            >
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="card bg-secondary border-0 mb-0">
+                                                                <div class="card-body px-lg-5 py-lg-5">
+                                                                    <form id="select_form" class="features" enctype="multipart/form-data" method="post"> {% csrf_token %}
+                                                                        <input type="hidden" name="method" value="impute">
+                                                                        Select Model Parameters:
+                                                                        <select name="model_type" id="model_type">
+                                                                            <option value="SGDRegressor" selected>SGDRegressor</option>
+                                                                            <option value="SGDClassifier">SGDClassifier</option>
+                                                                            <option value="LogisticRegression">LogisticRegression</option>
+                                                                            <option value="LinearRegression">LinearRegression</option>
+                                                                            <option value="DecisionTreeClassifier">DecisionTreeClassifier</option>
+                                                                            <option value="DecisionTreeRegressor">DecisionTreeRegressor</option>
+                                                                        </select>
+                                                                        <br><br>
+                                                                        Select Feature to Predict:
+                                                                        <select name="feature1" id="feature1">
+
+                                                                        </select>
+                                                                        <!-- <br><br>
+                                                                        Impute zero vaues: -->
+                                                                        <!-- <select name="imputeZero" id="imputeZero">
+                                                                            <option value="No" selected>No</option>
+                                                                            <option value="Yes">Yes</option>
+                                                                        </select> -->
+                                                                        <!-- <br><br>
+                                                                        Pick Imputation Method:
+                                                                        <select name="imputeMethod" id="imputeMethod">
+                                                                                <option value="Median">Median</option>
+                                                                                <option value="Mean">Mean</option>
+                                                                        </select> -->
+                                                                        <!-- <br><br>
+                                                                        Note:Categorical columns regardless of method will be imputed using most their frequent value. -->
+                                                                        <br><br>
+                                                                        <input type="submit" value="Select" class="btn btn-primary btn-sm"  />
+                                                    
+                                                                    
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                            <!-- Button trigger modal -->
+                                            
+                                            <!-- Modal -->
+                                            <div
+                                                class="modal fade"
+                                                id="exampleModal7"
+                                                tabindex="-1"
+                                                role="dialog"
+                                                aria-labelledby="exampleModalLabel7"
+                                                aria-hidden="true"
+                                            >
+                                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLabel7">
+                                                                Categorical Imputer
+                                                            </h5>
+                                                            <button
+                                                                type="button"
+                                                                class="close"
+                                                                data-dismiss="modal"
+                                                                aria-label="Close"
+                                                            >
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="card bg-secondary border-0 mb-0">
+                                                                <div class="card-body px-lg-5 py-lg-5">
+                                                                    <form
+                                                                        method="post"
+                                                                        enctype="multipart/form-data"
+                                                                        id="categoricalImputerForm"
+                                                                    >
+                                                                        {% csrf_token %}
+                                                                        <div id="manualSelectCol">
+                                                                            <label for="catColumns"
+                                                                                >Select Columns:
+                                                                            </label>
+
+                                                                            <select
+                                                                                data-placeholder="Choose columns to drop"
+                                                                                class="select form-control chosen-select"
+                                                                                multiple
+                                                                                name="catColumns"
+                                                                                id="catColumns"
+                                                                                required
+                                                                            >
+                                                                                <!-- <option value="all" selected>Select All</option> -->
+                                                                                {% for col in categorical_features %}
+                                                                                <option value="{{ col }}">
+                                                                                    {{ col }}
+                                                                                </option>
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div>
+                                                                        <br />
+                                                                        <label for="methodCat">Choose a method:</label>
+                                                                        <select
+                                                                            name="methodCat"
+                                                                            id="methodCat"
+                                                                            onchange="yesnoCheck(this);"
+                                                                            class="form-control"
+                                                                        >
+                                                                            <option value="most_frequent">
+                                                                                Most Frequent
+                                                                            </option>
+                                                                            <option value="constant">
+                                                                                Enter Manually
+                                                                            </option>
+                                                                        </select>
+                                                                        <br />
+                                                                        <div id="ifYes" style="display: none">
+                                                                            <br />
+                                                                            <label for="fillna_value"
+                                                                                >Enter the value:
+                                                                            </label>
+                                                                            <input
+                                                                                type="text"
+                                                                                id="fillna_value"
+                                                                                name="fillna_value"
+                                                                                class="form-control"
+                                                                            />
+                                                                        </div>
+                                                                        <br />
+                                                                        <button
+                                                                            type="submit"
+                                                                            name="transformer"
+                                                                            form="categoricalImputerForm"
+                                                                            value="categoricalImputer"
+                                                                            class="btn btn-primary btn-sm"
+                                                                        >
+                                                                            Transform
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                    class="tab-pane fade"
+                                    id="tabs-icons-text-2"
+                                    role="tabpanel"
+                                    aria-labelledby="tabs-icons-text-2-tab"
+                                >
+                                    <div class="card-body">
+                                        <div class="row mb-1 pb-1">
+                                            <!-- Button trigger modal -->
+                                            <div class="col-lg-4">
+                                                <div
+                                                    class="card h-100 bg-primary"
+                                                    style="border-radius: 25px; height: 5px"
+                                                    title=""
+                                                >
+                                                    <div class="card-body pt-3 pb-1">
+                                                        <h5 class="h3 text-secondary text-uppercase">
+                                                            Drop Arbitrary Features
+                                                        </h5>
+                                                        <p class="text-secondary">
+                                                            <small> Drops a list of selected columns </small>
+                                                        </p>
+                                                        <button
+                                                            class="btn btn-sm btn-secondary"
+                                                            data-toggle="modal"
+                                                            data-target="#exampleModal3"
+                                                            data-placement="bottom"
+                                                        >
+                                                            Apply
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Modal -->
+                                            <div
+                                                class="modal fade"
+                                                id="exampleModal3"
+                                                tabindex="-1"
+                                                role="dialog"
+                                                aria-labelledby="exampleModalLabel"
+                                                aria-hidden="true"
+                                            >
+                                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLabel">
+                                                                Drop Arbitrary Features
+                                                            </h5>
+                                                            <button
+                                                                type="button"
+                                                                class="close"
+                                                                data-dismiss="modal"
+                                                                aria-label="Close"
+                                                            >
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="card bg-secondary border-0 mb-0">
+                                                                <div class="card-body px-lg-5 py-lg-5">
+                                                                    <form id="DropFeature" class="features" enctype="multipart/form-data" method="post"> {% csrf_token %}
+                                                                        Select Which feature to drop:
+                                                                        <input type="hidden" name="method" value="dropFeature">
+                                                                        <select name="feature2" id="feature2">
+                                                                            
+                                                                        </select>
+                                                                        <input type="submit" value="Transform" class="btn btn-primary btn-sm"  />
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Button trigger modal -->
+                                            <div class="col-lg-4">
+                                                <div
+                                                    class="card h-100 bg-primary"
+                                                    style="border-radius: 25px; height: 5px"
+                                                    title=""
+                                                >
+                                                    <div class="card-body pt-3 pb-1">
+                                                        <h5 class="h3 text-secondary text-uppercase">
+                                                            Drop Correlated Feature
+                                                        </h5>
+                                                        <p class="text-secondary">
+                                                            <small>
+                                                                Removes similar numerical columns based on correlation
+                                                                threshold
+                                                            </small>
+                                                        </p>
+                                                        <button
+                                                            class="btn btn-sm btn-secondary"
+                                                            data-toggle="modal"
+                                                            data-target="#exampleModal4"
+                                                            data-placement="bottom"
+                                                        >
+                                                            Apply
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Modal -->
+                                            <div
+                                                class="modal fade"
+                                                id="exampleModal4"
+                                                tabindex="-1"
+                                                role="dialog"
+                                                aria-labelledby="exampleModalLabel"
+                                                aria-hidden="true"
+                                            >
+                                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLabel">
+                                                                Drop Correlated Features
+                                                            </h5>
+                                                            <button
+                                                                type="button"
+                                                                class="close"
+                                                                data-dismiss="modal"
+                                                                aria-label="Close"
+                                                            >
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="card bg-secondary border-0 mb-0">
+                                                                <div class="card-body px-lg-5 py-lg-5">
+                                                                    <form id="dropCorrelated" class="features" enctype="multipart/form-data" method="post"> {% csrf_token %}
+                                                                        <input type="hidden" name="method" value="dropCorrelated">
+                                                                        Select the feature you want to predict (so that it doesn't get removed):
+                                                                        <select name="target" id="feature3">
+                                                                            
+                                                                        </select>
+                                                                        <br><br>
+                                                                        <label for="corrThreshold"
+                                                                            >Correlation threshold is between 0 to 1.
+                                                                            Correlation values between 0.9 and 1.0
+                                                                            indicate columns that are very highly
+                                                                            similar or correlated.
+                                                                            <br />
+                                                                            <br />
+                                                                            Please enter the correlation
+                                                                            threshold:</label
+                                                                        >
+                                                                    
+                                                                        <br>
+                                                                        <input
+                                                                            type="number"
+                                                                            step="0.01"
+                                                                            min="0"
+                                                                            max="1"
+                                                                            id="corrThreshold"
+                                                                            name="corrThreshold"
+                                                                            class="form-control"
+                                                                            /><br /><br /><br />
+                                                                        <input type="submit" value="Transform" class="btn btn-primary btn-sm"  />
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Button trigger modal -->
+                                            <div class="col-lg-4">
+                                                <div
+                                                    class="card h-100 bg-primary"
+                                                    style="border-radius: 25px; height: 5px"
+                                                    title=""
+                                                >
+                                                    <div class="card-body pt-3 pb-1">
+                                                        <h5 class="h3 text-secondary text-uppercase">Replace Value</h5>
+                                                        <p class="text-secondary">
+                                                            <small>Replaces a value in the selected column</small>
+                                                        </p>
+                                                        <button
+                                                            class="btn btn-sm btn-secondary"
+                                                            data-toggle="modal"
+                                                            data-target="#exampleModal8"
+                                                            data-placement="bottom"
+                                                        >
+                                                            Apply
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Modal -->
+                                            <div
+                                                class="modal fade"
+                                                id="exampleModal8"
+                                                tabindex="-1"
+                                                role="dialog"
+                                                aria-labelledby="exampleModalLabel"
+                                                aria-hidden="true"
+                                            >
+                                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLabel">
+                                                                Replace Value
+                                                            </h5>
+                                                            <button
+                                                                type="button"
+                                                                class="close"
+                                                                data-dismiss="modal"
+                                                                aria-label="Close"
+                                                            >
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="card bg-secondary border-0 mb-0">
+                                                                <div class="card-body px-lg-5 py-lg-5">
+                                                                    <form
+                                                                        method="post"
+                                                                        enctype="multipart/form-data"
+                                                                        id="replaceValueForm"
+                                                                    >
+                                                                        {% csrf_token %}
+                                                                        <div id="manualSelectCol">
+                                                                            <label for="replaceColumn"
+                                                                                >Select Column:
+                                                                            </label>
+
+                                                                            <select
+                                                                                data-placeholder="Choose column"
+                                                                                class="select form-control chosen-select"
+                                                                                name="replaceColumn"
+                                                                                id="replaceColumn"
+                                                                                required
+                                                                            >
+                                                                                <!-- <option value="all" selected>Select All</option> -->
+                                                                                {% for col in categorical_features %}
+                                                                                <option value="{{ col }}">
+                                                                                    {{ col }}
+                                                                                </option>
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div>
+                                                                        <br />
+
+                                                                        <label for="to_replace"
+                                                                            >Please enter the value you want to replace:
+                                                                        </label>
+                                                                        <input
+                                                                            type="text"
+                                                                            id="to_replace"
+                                                                            name="to_replace"
+                                                                            class="form-control"
+                                                                        /><br /><br />
+
+                                                                        <label for="value"
+                                                                            >Please enter the value you want to replace
+                                                                            with:
+                                                                        </label>
+                                                                        <input
+                                                                            type="text"
+                                                                            id="value"
+                                                                            name="value"
+                                                                            class="form-control"
+                                                                        /><br /><br />
+                                                                        <button
+                                                                            type="submit"
+                                                                            name="transformer"
+                                                                            form="replaceValueForm"
+                                                                            value="replaceValue"
+                                                                            class="btn btn-primary btn-sm"
+                                                                        >
+                                                                            Transform
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                    class="tab-pane fade"
+                                    id="tabs-icons-text-3"
+                                    role="tabpanel"
+                                    aria-labelledby="tabs-icons-text-3-tab"
+                                >
+                                <!-- -->
+                                    <div class="card-body">
+                                        <div class="row mb-1 pb-1">
+                                            <div class="col-lg-4">
+                                                <!-- Implement Later
+                                                <div
+                                                    class="card h-100 bg-primary"
+                                                    style="border-radius: 25px; height: 5px"
+                                                    title=""
+                                                >
+                                                    <div class="card-body pb-1 pt-3">
+                                                        <h5 class="h3 text-secondary text-uppercase">
+                                                            Manual Outlier Remover
+                                                        </h5>
+                                                        <p class="text-secondary">
+                                                            <small>
+                                                                Removes values outside of user specified range
+                                                            </small>
+                                                        </p>
+                                                        <button
+                                                            class="btn btn-sm btn-secondary"
+                                                            data-toggle="modal"
+                                                            data-target="#exampleModal5"
+                                                            data-placement="bottom"
+                                                        >
+                                                            Apply
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                -->
+                                            </div>
+                                            <!-- Modal -->
+                                            <div
+                                                class="modal fade"
+                                                id="exampleModal5"
+                                                tabindex="-1"
+                                                role="dialog"
+                                                aria-labelledby="exampleModalLabel"
+                                                aria-hidden="true"
+                                            >
+                                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLabel">
+                                                                Arbitrary Outlier Capper
+                                                            </h5>
+                                                            <button
+                                                                type="button"
+                                                                class="close"
+                                                                data-dismiss="modal"
+                                                                aria-label="Close"
+                                                            >
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="card bg-secondary border-0 mb-0">
+                                                                <div class="card-body px-lg-5 py-lg-5">
+                                                                    <form
+                                                                        method="post"
+                                                                        enctype="multipart/form-data"
+                                                                        id="capperForm"
+                                                                    >
+                                                                        {% csrf_token %}
+                                                                        <div id="manualSelectCol">
+                                                                            <h6 style="font-size: 1.1rem">
+                                                                                Select column
+                                                                            </h6>
+
+                                                                            <select
+                                                                                data-placeholder="Choose column"
+                                                                                class="select form-control chosen-select"
+                                                                                name="capColumn"
+                                                                                id="capColumn"
+                                                                            >
+                                                                                {% for col in numerical_features %}
+                                                                                <option value="{{ col }}">
+                                                                                    {{ col }}
+                                                                                </option>
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div>
+
+                                                                        <label for="capRight"
+                                                                            >Please enter the maximum value:</label
+                                                                        >
+                                                                        <input
+                                                                            type="number"
+                                                                            step="0.01"
+                                                                            id="capRight"
+                                                                            name="capRight"
+                                                                            class="form-control"
+                                                                        /><br /><br />
+
+                                                                        <label for="capLeft"
+                                                                            >Please enter the minimum value:</label
+                                                                        >
+                                                                        <input
+                                                                            type="number"
+                                                                            step="0.01"
+                                                                            id="capLeft"
+                                                                            name="capLeft"
+                                                                            class="form-control"
+                                                                        /><br /><br />
+
+                                                                        <br />
+                                                                        <button
+                                                                            type="submit"
+                                                                            name="transformer"
+                                                                            form="capperForm"
+                                                                            value="arbitraryOutlierCapper"
+                                                                            class="btn btn-primary btn-sm"
+                                                                        >
+                                                                            Transform
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Button trigger modal -->
+                                            <div class="col-lg-4">
+                                                <div
+                                                    class="card h-100 bg-primary"
+                                                    style="border-radius: 25px; height: 5px"
+                                                    title=""
+                                                >
+                                                    <div class="card-body pb-1 pt-3">
+                                                        <h5 class="h3 text-secondary text-uppercase">
+                                                            Automated Outlier remover
+                                                        </h5>
+                                                        <p class="text-secondary">
+                                                            <small
+                                                                >Removes values based on automated outliers
+                                                                calculation</small
+                                                            >
+                                                        </p>
+                                                        <button
+                                                            class="btn btn-sm btn-secondary"
+                                                            data-toggle="modal"
+                                                            data-target="#exampleModal6"
+                                                            data-placement="bottom"
+                                                        >
+                                                            Apply
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Modal -->
+                                            <div
+                                                class="modal fade"
+                                                id="exampleModal6"
+                                                tabindex="-1"
+                                                role="dialog"
+                                                aria-labelledby="exampleModalLabel"
+                                                aria-hidden="true"
+                                            >
+                                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLabel">
+                                                                Outlier Trimmer
+                                                            </h5>
+                                                            <button
+                                                                type="button"
+                                                                class="close"
+                                                                data-dismiss="modal"
+                                                                aria-label="Close"
+                                                            >
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="card bg-secondary border-0 mb-0">
+                                                                <div class="card-body px-lg-5 py-lg-5">
+                                                                    <form
+                                                                        method="post"
+                                                                        enctype="multipart/form-data"
+                                                                        id="outlierTrimmerForm"
+                                                                    >
+                                                                        {% csrf_token %}
+                                                                        <label for="tail"
+                                                                            >Choose whether to cap outliers on the
+                                                                            right, left or both tails of the
+                                                                            distribution:</label
+                                                                        >
+                                                                        <select
+                                                                            name="tail"
+                                                                            id="tail"
+                                                                            class="form-control"
+                                                                        >
+                                                                            <option value="both">Both</option>
+                                                                            <option value="right">Right</option>
+                                                                            <option value="left">Left</option></select
+                                                                        ><br /><br /><br />
+                                                                        <button
+                                                                            type="submit"
+                                                                            name="transformer"
+                                                                            form="outlierTrimmerForm"
+                                                                            value="outlierTrimmer"
+                                                                            class="btn btn-primary btn-sm"
+                                                                        >
+                                                                            Transform
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% comment %} end {% endcomment %}
+                   
+                    {% comment %}
+                    <h2 style="padding-bottom: 20px">Select the transformer you want to use and then click Next</h2>
+                    {% endcomment %}
+
+                    
+
+                    <!-- Add later!
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="card-title">Transformers Applied</h2>
+                            <div style="width:100%; overflow:auto;">
+                                <div>{{ tables |safe }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    -->
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-12">
+                                <div class="row">
+                                    <div class="col-lg-4"></div>
+                                    <div class="col-lg-4">
+                                        <!-- <div class="card card-lift--hover  h-100 bg-white" style="border-radius:25px; width:120%"> -->
+                                        <div class="card-body py-5">
+                                            <form action="{% url 'modelReTraining' %}" method="get" enctype="multipart/form-data" id="next">
+                                                <div id="submitBtnLoaderParent">
+                                                <input type="Hidden" id="datasetNameset" name="datasetName" >
+                                                    <button
+                                                        type="submit"
+                                                        class="btn btn-primary btn-lg btn-block"
+                                                        form="next"
+                                                        id="submitBtnLoader"
+                                                    >
+                                                        Next
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <!-- </div> -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE -->
+{% block javascripts %}
+<script>
+    const uploadBtn = document.getElementById("uploadBtn")
+    uploadBtn.addEventListener('click', () => {
+        console.log("Pene")
+        const file = document.getElementById("file")
+        console.log(file.files[0].name)
+    })
+</script>
+
+<script src="/static/assets/vendor/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+
+<script>
+    $("#my_table").DataTable({
+        pageLength: 5,
+        "ordering": false,
+        language: {
+            "paginate": {
+              "previous": "<<",
+              "next":">>"
+            }
+          }
+    });
+</script>
+
+<script>
+    $("#sample_table").DataTable({
+        pageLength: 5,
+        language: {
+            "paginate": {
+              "previous": "<<",
+              "next":">>"
+            }
+          }
+    });
+</script>
+
+<script>
+    $("#submitBtnLoader").on("click", function () {
+        showLoader();
+    });
+
+    function showLoader() {
+        $("#submitBtnLoader").hide();
+        // $('#submitBtnLoaderParent').append('<div style="" id="loadingDiv"><div class="loader">Loading...</div></div>');
+        $("#submitBtnLoaderParent").append(
+            '<button type="submit" class="btn btn-primary btn-lg btn-block" name="next" form="next" value="next" id="submitBtnLoader" disabled><span class="spinner"></span>Loading...</button>'
+        );
+        // console.log('Came here')
+    }
+</script>
+
+<script>
+    function yesnoCheck(that) {
+        if (that.value == "constant") {
+            document.getElementById("ifYes").style.display = "block";
+        } else {
+            document.getElementById("ifYes").style.display = "none";
+        }
+    }
+</script>
+
+<script>
+    fetch(
+        "/listfiles",
+        {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }
+
+    ).then((response) => {
+        return response.json();
+    }).then((data) => {
+        // selected
+        let params = new URLSearchParams(document.location.search);
+        let datasetName = params.get("datasetName");
+        if (datasetName == null) {
+            document.querySelector("#dataSets option").selected = true;
+        }
+        // console.log(data);
+        var select = document.getElementById("dataSets");
+        for (var i = 0; i < data["csv"].length; i++) {
+            var opt = data["csv"][i];
+            var el = document.createElement("option");
+            if (datasetName == opt) {
+                el.selected = true;
+            }
+            el.innerText = opt;
+            el.value = opt;
+            select.appendChild(el);
+        }
+    });
+
+    document.getElementById("dataSets").addEventListener("change", function () {
+        document.getElementById("feature1").innerHTML = "";
+        fetch(
+            "/getfile?filename=" + this.value + "&table=true",
+            {
+                method: "GET",
+            }
+        ).then((response) => {
+            response.text().then((text) => {
+                document.getElementById("dvCSV").innerHTML = text;
+
+                let thead = document.querySelector("#dvCSV table tr");
+
+                Array.from(thead.children).forEach((element) => {
+                    let option = document.createElement("option");
+                    option.value = element.innerText;
+                    option.innerText = element.innerText;
+                    document.getElementById("feature1").appendChild(option);
+                });
+
+
+            });
+        });
+    });
+</script>
+
+<script type="text/javascript">
+    let fileName='';
+    let Columns=[];
+    const featuresImplemented=3;
+    $(function () 
+    {
+        function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+        }
+        var csrftoken = getCookie('csrftoken');
+        //Upload dataset to backend
+        $("#upload").bind("click", function () 
+        {
+            var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.csv|.txt)$/;
+            if (regex.test($("#fileUpload").val().toLowerCase())) 
+            {
+                if (typeof (FileReader) != "undefined") 
+                {
+                    var reader = new FileReader();
+                    reader.onload = function (e) 
+                    {
+                        var table = $("<table class='dataframe table table-striped table-bordered dataTable no-footer'>");
+                        var rows = e.target.result.split("\r\n"); //Might need to update this since linebreaks can be \r\n;
+                        for (var i = 0; i < rows.length; i++) 
+                        {
+                            var row = $("<tr />");
+                            var cells = rows[i].split(",");
+                            if (cells.length > 1) {
+                                for (var j = 0; j < cells.length; j++) 
+                                {
+                                    var cell = $("<td />");
+                                    cell.html(cells[j]);
+                                    if(i==0) //Grabs the variable names;
+                                        Columns.push(cells[j]);
+                                    row.append(cell);
+                                }
+                                table.append(row);
+                            }
+                        }
+                        $("#dvCSV").html('');
+                        $("#dvCSV").append(table);
+                        document.getElementById("feature1").innerHTML = "";
+                        for(let i=1;i<=featuresImplemented;i++) //Currently have 2 features implemented.
+                        {
+                            var select = document.getElementById("feature"+i);
+                            
+                            for(index in Columns) 
+                            {
+                
+                                select.options[select.options.length] = new Option(Columns[index], Columns[index]);
+                            }
+                 
+                        }
+                    }
+                    reader.readAsText($("#fileUpload")[0].files[0]);
+                    fileName=$("#fileUpload")[0].files[0].name;
+                    document.getElementById("datasetNameset").value = fileName;
+                    //const blob = new Blob([$("#fileUpload")[0].files[0]], { type: 'text/csv' });
+                    
+                } 
+                else 
+                {
+                    alert("This browser does not support HTML5.");
+                }
+            } 
+            else 
+            {
+                alert("Please upload a valid CSV file.");
+            }
+        });
+        //Show dataset on upload.
+        $("#datasetUpload").submit(function (event) 
+        {
+            
+            var fd = new FormData();
+            fd.append('csrfmiddlewaretoken',csrftoken);
+            fd.append('fileUpload', $("#fileUpload")[0].files[0]);
+            $.ajax({
+            type: "POST",
+            url: "upload",
+            data: fd,
+            contentType: false,
+            processData: false,
+            enctype: 'multipart/form-data'
+            }).done(function (data) {
+            console.log(fd);
+            });
+
+            event.preventDefault();
+        });
+        $("#select_form").submit(function(event)
+        {
+            var fd = new FormData(document.querySelector('#select_form'));
+
+            let form_fname = document.getElementById("dataSets").value;
+
+            if (form_fname === ""){
+                form_fname = fileName;
+            }
+
+            fd.append('fileName',form_fname);
+
+            console.log(fd);
+
+            //console.log(document.querySelector('#Impute'))
+            $.ajax({
+            type: "POST",
+            url: "",
+            data: fd,
+            contentType: false,
+            processData: false,
+            enctype: 'multipart/form-data'
+            }).done(function (data) {
+                // $("#dvCSV").html('');
+                // $("#dvCSV").append(data);
+                // console.log(fd);
+                console.log(link);
+                console.log(data);
+                var blob = new Blob([data], {type: 'application/octet-stream'});
+                var link = document.createElement("a");
+                link.href = window.URL.createObjectURL(blob);
+                link.download = "model_dict.pkl";
+                link.click();
+            }); 
+            event.preventDefault();
+        });
+
+        $("#DropFeature").submit(function(event)
+        {
+            var fd = new FormData(document.querySelector('#DropFeature'))
+            fd.append('fileName',fileName);
+            console.log(fd);
+            for(i=1;i<=featuresImplemented;i++)
+            {
+                $('#feature'+i+' option[value=\''+fd.get("feature2")+'\'] ').remove();
+            }
+            event.preventDefault();
+            //console.log(document.querySelector('#Impute'))
+
+            $.ajax({
+            type: "POST",
+            url: "",
+            data: fd,
+            contentType: false,
+            processData: false,
+            enctype: 'multipart/form-data'
+            }).done(function (data) {
+                $("#dvCSV").html('');
+                $("#dvCSV").append(data);
+            }); 
+            event.preventDefault();
+
+        });
+        $("#dropCorrelated").submit(function(event)
+        {
+            var fd = new FormData(document.querySelector('#dropCorrelated'))
+            fd.append('fileName',fileName);
+            console.log(fd);
+            event.preventDefault();
+            //console.log(document.querySelector('#Impute'))
+
+            $.ajax({
+            type: "POST",
+            url: "",
+            data: fd,
+            contentType: false,
+            processData: false,
+            enctype: 'multipart/form-data'
+            }).done(function (data) {
+                $("#dvCSV").html('');
+                $("#dvCSV").append(data);
+            }); 
+            event.preventDefault();
+
+        });
+        //Apply transmations:
+        $("#MeanMedianImpute").click(function()
+        {
+            if ( $('#Impute').css('visibility') == 'hidden' )
+                $('#Impute').css('visibility','visible');
+            else
+                $('#Impute').css('visibility','hidden');
+        });
+
+        $("#removeFeature").click(function()
+        {
+            if ( $('#DropFeature').css('visibility') == 'hidden' )
+                $('#DropFeature').css('visibility','visible');
+            else
+                $('#DropFeature').css('visibility','hidden');
+        });
+
+    });
+
+</script>
+{% endblock javascripts %}
