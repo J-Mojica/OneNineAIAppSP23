@@ -130,10 +130,12 @@
                                 These discrepancies might occur when the system or model underperforms for specific demographic groups or infrequently observed input conditions in the training data.
                             </p>
                         </div>
-                        <!-- <form id="errorAnalysis" enctype="multipart/form-data" method="post"> {% csrf_token %}
-                            <input type="submit" value="Apply" class="btn btn-primary btn-sm">
-                        </form> -->
-                        <button id="appBtn" onclick="myFunction()">Apply</button>
+                        <button
+                            class="btn btn-sm btn-secondary"
+                            id="applyBtn"
+                        >
+                            Apply
+                        </button>
                         <div id="end-page"></div>
                     </div>
 
@@ -149,19 +151,17 @@
 {% block javascripts %}
 
 <script>
-    function myFunction()
-    {
-        body = document.getElementById("end-page");
-        var i = document.createElement("iframe");
-        i.src = "http://localhost:5001/";
-        i.width = "900";
-        i.height = "900";
-        body.appendChild(i);
-    }
+    document.getElementById('applyBtn').onclick = function() {
+
+    var iframe = document.createElement('iframe');
+    iframe.width = "1100";
+    iframe.height = "960";
+    iframe.src = 'http://localhost:5001/';
+    body = document.getElementById("end-page");
+    body.appendChild(iframe);
+};
 </script>
 
-
-<script src="/static/assets/vendor/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
 
 <script>
     const uploadBtn = document.getElementById("uploadBtn")
@@ -172,91 +172,17 @@
     })
 </script>
 
+<script>
+    const applyBtn = document.getElementById("applyBtn")
+    uploadBtn.addEventListener('click', () => {
+        console.log("Pene")
+        const file = document.getElementById("file")
+        console.log(file.files[0].name)
+    })
+</script>
+
 <script src="/static/assets/vendor/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
 
-<script>
-    $("#my_table").DataTable({
-        pageLength: 5,
-        "ordering": false,
-        language: {
-            "paginate": {
-              "previous": "<<",
-              "next":">>"
-            }
-          }
-    });
-</script>
-
-<script>
-    $("#sample_table").DataTable({
-        pageLength: 5,
-        language: {
-            "paginate": {
-              "previous": "<<",
-              "next":">>"
-            }
-          }
-    });
-</script>
-
-<!-- <script>
-    fetch(
-        "/listfiles",
-        {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        }
-
-    ).then((response) => {
-        return response.json();
-    }).then((data) => {
-        // selected
-        let params = new URLSearchParams(document.location.search);
-        let datasetName = params.get("datasetName");
-        if (datasetName == null) {
-            document.querySelector("#dataSets option").selected = true;
-        }
-        // console.log(data);
-        var select = document.getElementById("dataSets");
-        for (var i = 0; i < data["csv"].length; i++) {
-            var opt = data["csv"][i];
-            var el = document.createElement("option");
-            if (datasetName == opt) {
-                el.selected = true;
-            }
-            el.innerText = opt;
-            el.value = opt;
-            select.appendChild(el);
-        }
-    });
-
-    document.getElementById("dataSets").addEventListener("change", function () {
-        // document.getElementById("feature1").innerHTML = "";
-        fetch(
-            "/getfile?filename=" + this.value + "&table=true",
-            {
-                method: "GET",
-            }
-        ).then((response) => {
-            response.text().then((text) => {
-                document.getElementById("dvCSV").innerHTML = text;
-
-                let thead = document.querySelector("#dvCSV table tr");
-
-                // Array.from(thead.children).forEach((element) => {
-                //     let option = document.createElement("option");
-                //     option.value = element.innerText;
-                //     option.innerText = element.innerText;
-                //     document.getElementById("feature1").appendChild(option);
-                // });
-
-
-            });
-        });
-    });
-</script> -->
 
 <script type="text/javascript">
     let fileName='';
@@ -280,35 +206,6 @@
         return cookieValue;
         }
         var csrftoken = getCookie('csrftoken');
-
-        //Post request to get the model name
-        var fd = new FormData();
-        fd.append('csrfmiddlewaretoken',csrftoken);
-        $.ajax({
-        type: "POST",
-        url: "getPKL",
-        data: fd,
-        contentType: false,
-        processData: false,
-        enctype: 'multipart/form-data'
-        }).done(function (data) {
-            var select = document.getElementById("models");         
-            for(model in data['models']) 
-                {            
-                    //List all models stored on our backend.
-                    select.options[select.options.length] = new Option(data['models'][model], data['models'][model]);
-                }
-        });
-
-        //When the user selects a model from our backend update the filename
-        $("#models").change(function()
-        {
-            modelName=$("#models").val();
-            var fd = new FormData();
-            fd.append('csrfmiddlewaretoken',csrftoken);
-            fd.append('modelName', modelName);
-        });
-
 
         //Upload pkl file to backend
         $("#mUpload").bind("click", function () 
@@ -376,6 +273,8 @@
         $("#dataSets").change(function()
         {
             fileName=$("#dataSets").val();
+            document.getElementById("datasetNameset").value = fileName;
+            document.getElementById("datasetNameset2").value = fileName;
             var fd = new FormData();
             fd.append('csrfmiddlewaretoken',csrftoken);
             fd.append('fileName', fileName);
@@ -390,6 +289,17 @@
             }).done(function (data) {
                 $("#dvCSV").html('');
                 $("#dvCSV").append(data);
+                var fd = new FormData();
+                fd.append('csrfmiddlewaretoken',csrftoken);
+                fd.append('fileName', fileName);
+                $.ajax({
+                    type: "POST",
+                    url: "getDatasetCols",
+                    data: fd,
+                    contentType: false,
+                    processData: false,
+                    enctype: 'multipart/form-data'
+                })
             });
 
         });
@@ -456,31 +366,10 @@
             processData: false,
             enctype: 'multipart/form-data'
             }).done(function (data) {
-            $('#backendDatasets').hide(); //Hide the option to select a dataset.
+            console.log(fd);
             });
             event.preventDefault();
         });
-        // $("#errorAnalysis").submit(function(event)
-        // {
-        //     window.location.href = "http://localhost:5001/";
-        //     // var fd = new FormData(document.querySelector('#errorAnalysis'))
-        //     // fd.append('fileName',fileName);
-        //     // fd.append('modelName',modelName);
-        //     // fd.append('method', 'errorAnalysis')
-
-        //     // //console.log(document.querySelector('#Impute'))
-        //     // $.ajax({
-        //     // type: "POST",
-        //     // url: "",
-        //     // data: fd,
-        //     // contentType: false,
-        //     // processData: false,
-        //     // enctype: 'multipart/form-data'
-        //     // }).done(function (data) {
-        //     //     console.log(data);
-        //     // }); 
-        //     // event.preventDefault();
-        // });
     });
 
 </script>
