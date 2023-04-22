@@ -104,25 +104,10 @@
                         </div>
                     </div>
 
-                    <form id="modelUpload" enctype="multipart/form-data" method="post"> {% csrf_token %}
-                        <h3 class="mb-0">Model file</h3>
-                        <input type="file" id="modUpload" />
-                        <input type="submit" value="Upload" id="mUpload" />
-                    </form>
-
-                    <div id="backendModels" class="card">
-                        <div class="card-body">
-                             Or select a model file previously stored on our server:
-                            <select id="models" > <option value="">Select a model</option> </select>
-                        </div>
-                    </div>
-
                     <form id="datasetUpload" enctype="multipart/form-data" method="post"> {% csrf_token %}
-                        <h3 class="mb-0">Data</h3>
                         <h3 class="mb-0">Data</h3>
                         <input type="file" id="fileUpload" />
                         <input type="submit" value="Upload" id="dataUpload" />
-                        <input type="submit" value="Upload" id="dataUpload" />
                     </form>
 
                     <div id="backendDatasets" class="card">
@@ -132,21 +117,12 @@
                         </div>
                     </div>
 
-                    <div id="backendDatasets" class="card">
-                        <div class="card-body">
-                             Or select a dataset previously stored on our server:
-                            <select id="dataSets" > <option value="">Select a dataset</option> </select>
-                        </div>
-                    </div>
-                    <!-- END UPLOAD DATA -->
-                    <div class="card" id="dvCSV"></div>          
+                    <!-- END UPLOAD DATA -->      
                     <div class="card" id="dvCSV"></div>          
 
                     <div class="card">
                         <div class="card-header">
                             <h2 class="mb-0">Create error analysis dashboard</h2>
-                        <div class="card-header">
-                            <h2 class="mb-0">Create error analysis dashboard</h2>
                         </div>
 
                         <div class="card-body">
@@ -154,15 +130,10 @@
                                 Error analysis helps identify cohorts of data with higher error rate than the overall benchmark. 
                                 These discrepancies might occur when the system or model underperforms for specific demographic groups or infrequently observed input conditions in the training data.
                             </p>
-                        <div class="card-body">
-                            <p class="card-text mb-2">
-                                Error analysis helps identify cohorts of data with higher error rate than the overall benchmark. 
-                                These discrepancies might occur when the system or model underperforms for specific demographic groups or infrequently observed input conditions in the training data.
-                            </p>
                         </div>
-                        <form id="errorAnalysis" enctype="multipart/form-data" method="post"> {% csrf_token %}
+                        <!-- <form id="errorAnalysis" enctype="multipart/form-data" method="post"> {% csrf_token %}
                             <input type="submit" value="Apply" class="btn btn-primary btn-sm">
-                        </form>
+                        </form> -->
                         <!-- <form id="errorAnalysis" enctype="multipart/form-data" method="post"> {% csrf_token %}
                             <input type="submit" value="Apply" class="btn btn-primary btn-sm">
                         </form> -->
@@ -191,7 +162,7 @@
     {
         body = document.getElementById("end-page");
         var i = document.createElement("iframe");
-        i.src = "http://localhost:5001/";
+        i.src = "http://localhost:49402/";
         i.width = "900";
         i.height = "900";
         body.appendChild(i);
@@ -239,7 +210,6 @@
 
 <script type="text/javascript">
     let fileName='';
-    let modelName='';
     let modelName='';
     let Columns=[];
     $(function () 
