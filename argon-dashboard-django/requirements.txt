@@ -11,9 +11,10 @@ toml==0.10.2
 Unipath==1.1
 whitenoise==5.3.0
 pandas==1.4.0
-numpy==1.21.2
-scikit-learn==1.24.2
-responsibleai==0.25.0
+numpy==1.21.0
+scikit-learn==1.0.2
+numba==0.50.0
+responsibleai==0.26.0
 raiwidgets==0.25.0
 fairlearn==0.8.0
 mlflow==2.2.2

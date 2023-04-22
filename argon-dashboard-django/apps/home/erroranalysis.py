@@ -16,7 +16,7 @@ import socket
 def createDashboard(request):
     df=pd.read_csv('./users/'+request.user.username+'/'+request.POST['fileName'],skipinitialspace=True) #Turns all blank cells into NaN
     model = pickle.load(open('./users/'+request.user.username+'/'+request.POST['modelName'], 'rb'))
-    testing_feature = ['admit']
+    testing_feature = list(set(df.columns) - set(model.feature_names_in_))
     y_test = df[testing_feature]
     X_test = df.drop(testing_feature, axis=1)
     y_pred = model.predict(X_test)

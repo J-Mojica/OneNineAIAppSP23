@@ -83,8 +83,6 @@
     <div class="row">
         <div class="col">
             <div class="card shadow">
-                
-
                 <div class="m-5" id="transformerGroup">
                     {% comment %} start {% endcomment %}
                     <!-- START UPLOAD DATA -->
@@ -100,7 +98,7 @@
                     <div id="backendModels" class="card">
                         <div class="card-body">
                              Or select a model file previously stored on our server:
-                            <select id="models" > <option value="">Select a model</option> </select>
+                            <select id="models" > <option value="" hidden selected>Select a model</option> </select>
                         </div>
                     </div>
 
@@ -113,7 +111,7 @@
                     <div id="backendDatasets" class="card">
                         <div class="card-body">
                              Or select a dataset previously stored on our server:
-                            <select id="dataSets" > <option value="">Select a dataset</option> </select>
+                             <select id="dataSets" > <option value="" hidden selected>Select a dataset</option> </select>
                         </div>
                     </div>
 
@@ -131,8 +129,8 @@
                                 These discrepancies might occur when the system or model underperforms for specific demographic groups or infrequently observed input conditions in the training data.
                             </p>
                         </div>
-                        <form id="errorAnalysis" enctype="multipart/form-data" method="post"> {% csrf_token %}
-                            <input type="submit" value="Apply" class="btn btn-primary btn-sm">
+                        <form id="errorAnalysis" style="text-align:center" enctype="multipart/form-data" method="post"> {% csrf_token %}
+                            <input type="submit" value="Apply" class="btn btn-primary btn-lg">
                         </form>
                         
                         <!-- <button id="appBtn" onclick="myFunction()">Apply</button> -->
@@ -150,22 +148,6 @@
 
 <!-- Specific JS goes HERE -->
 {% block javascripts %}
-
-
-<script src="/static/assets/vendor/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
-
-
-<script>
-    function myFunction()
-    {
-        body = document.getElementById("end-page");
-        var i = document.createElement("iframe");
-        i.src = "http://localhost:49402/";
-        i.width = "900";
-        i.height = "900";
-        body.appendChild(i);
-    }
-</script>
 
 
 <script src="/static/assets/vendor/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
@@ -311,123 +293,10 @@
         processData: false,
         enctype: 'multipart/form-data'
         }).done(function (data) {
-            var select = document.getElementById("dataSets");         
+            var select = document.getElementById("dataSets");       
             for(dataset in data['dataSets']) 
                 {            
-                    //List all datasets stored on our backend.
-                    select.options[select.options.length] = new Option(data['dataSets'][dataset], data['dataSets'][dataset]);
-                    
-                }
-        });
-
-        //When the user selects a dataset from our backend update the filename and display a preview of that dataset
-        $("#dataSets").change(function()
-        {
-            fileName=$("#dataSets").val();
-            var fd = new FormData();
-            fd.append('csrfmiddlewaretoken',csrftoken);
-            fd.append('fileName', fileName);
-            fd.append('method','view');
-            $.ajax({
-            type: "POST",
-            url: "",
-            data: fd,
-            contentType: false,
-            processData: false,
-            enctype: 'multipart/form-data'
-            }).done(function (data) {
-                $("#dvCSV").html('');
-                $("#dvCSV").append(data);
-            });
-
-        });
-
-
-        //Post request to get the model name
-        var fd = new FormData();
-        fd.append('csrfmiddlewaretoken',csrftoken);
-        $.ajax({
-        type: "POST",
-        url: "getPKL",
-        data: fd,
-        contentType: false,
-        processData: false,
-        enctype: 'multipart/form-data'
-        }).done(function (data) {
-            var select = document.getElementById("models");         
-            for(model in data['models']) 
-                {            
-                    //List all models stored on our backend.
-                    select.options[select.options.length] = new Option(data['models'][model], data['models'][model]);
-                }
-        });
-
-        //When the user selects a model from our backend update the filename
-        $("#models").change(function()
-        {
-            modelName=$("#models").val();
-            var fd = new FormData();
-            fd.append('csrfmiddlewaretoken',csrftoken);
-            fd.append('modelName', modelName);
-        });
-
-
-        //Upload pkl file to backend
-        $("#mUpload").bind("click", function () 
-        {
-            var regex = /^([a-zA-Z0-9\s_\\.\-:\(\)])+(.pkl)$/;
-            if (regex.test($("#modUpload").val().toLowerCase())) 
-            {
-                if (typeof (FileReader) != "undefined") 
-                {
-                    var reader = new FileReader();
-                    reader.readAsText($("#modUpload")[0].files[0]);
-                    modelName=$("#modUpload")[0].files[0].name;
-                    //const blob = new Blob([$("#fileUpload")[0].files[0]], { type: 'text/csv' });
-                } 
-                else 
-                {
-                    alert("This browser does not support HTML5.");
-                }
-            } 
-            else 
-            {
-                alert("Please upload a valid PKL file.");
-            }
-        });
-
-        $("#modelUpload").submit(function (event) 
-        {
-            var fd = new FormData();
-            fd.append('csrfmiddlewaretoken',csrftoken);
-            fd.append('fileUpload', $("#modUpload")[0].files[0]);
-            $.ajax({
-            type: "POST",
-            url: "upload",
-            data: fd,
-            contentType: false,
-            processData: false,
-            enctype: 'multipart/form-data'
-            }).done(function (data) {
-            console.log(fd);
-            });
-            event.preventDefault();
-        });
-
-        //Post request to get the dataset names
-        var fd = new FormData();
-        fd.append('csrfmiddlewaretoken',csrftoken);
-        $.ajax({
-        type: "POST",
-        url: "getDataset",
-        data: fd,
-        contentType: false,
-        processData: false,
-        enctype: 'multipart/form-data'
-        }).done(function (data) {
-            var select = document.getElementById("dataSets");         
-            for(dataset in data['dataSets']) 
-                {            
+                    console.log(data['dataSets'][dataset]);
                     //List all datasets stored on our backend.
                     select.options[select.options.length] = new Option(data['dataSets'][dataset], data['dataSets'][dataset]);
                 }
@@ -542,8 +411,8 @@
                 var i = document.createElement("iframe");
                 i.src = "http://localhost:" + data;
                 console.log(i.src);
-                i.width = "900";
-                i.height = "900";
+                i.width = "1100";
+                i.height = "1000";
                 body.appendChild(i);
             }); 
             event.preventDefault();
