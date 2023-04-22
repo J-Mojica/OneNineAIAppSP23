@@ -948,21 +948,9 @@
                                                                         enctype="multipart/form-data"
                                                                         id="outlierTrimmerForm"
                                                                     >
+                                                                    <input type="hidden" name="method" value="dropOutlier">
                                                                         {% csrf_token %}
-                                                                        <label for="tail"
-                                                                            >Choose whether to cap outliers on the
-                                                                            right, left or both tails of the
-                                                                            distribution:</label
-                                                                        >
-                                                                        <select
-                                                                            name="tail"
-                                                                            id="tail"
-                                                                            class="form-control"
-                                                                        >
-                                                                            <option value="both">Both</option>
-                                                                            <option value="right">Right</option>
-                                                                            <option value="left">Left</option></select
-                                                                        ><br /><br /><br />
+            
                                                                         <button
                                                                             type="submit"
                                                                             name="transformer"
@@ -1424,6 +1412,28 @@
         });
 
         $("#autoClean").submit(function(event)
+        {
+            var fd = new FormData(document.querySelector('#autoClean'))
+            fd.append('fileName',fileName);
+            console.log(fd);
+            event.preventDefault();
+            //console.log(document.querySelector('#Impute'))
+
+            $.ajax({
+            type: "POST",
+            url: "",
+            data: fd,
+            contentType: false,
+            processData: false,
+            enctype: 'multipart/form-data'
+            }).done(function (data) {
+                $("#dvCSV").html('');
+                $("#dvCSV").append(data);
+            }); 
+            event.preventDefault();
+        });
+        
+        $("#outlierTrimmerForm").submit(function(event)
         {
             var fd = new FormData(document.querySelector('#autoClean'))
             fd.append('fileName',fileName);

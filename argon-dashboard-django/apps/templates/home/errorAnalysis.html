@@ -104,9 +104,24 @@
                         </div>
                     </div>
 
+                    <form id="modelUpload" enctype="multipart/form-data" method="post"> {% csrf_token %}
+                        <h3 class="mb-0">Model file</h3>
+                        <input type="file" id="modUpload" />
+                        <input type="submit" value="Upload" id="mUpload" />
+                    </form>
+
+                    <div id="backendModels" class="card">
+                        <div class="card-body">
+                             Or select a model file previously stored on our server:
+                            <select id="models" > <option value="">Select a model</option> </select>
+                        </div>
+                    </div>
+
                     <form id="datasetUpload" enctype="multipart/form-data" method="post"> {% csrf_token %}
                         <h3 class="mb-0">Data</h3>
+                        <h3 class="mb-0">Data</h3>
                         <input type="file" id="fileUpload" />
+                        <input type="submit" value="Upload" id="dataUpload" />
                         <input type="submit" value="Upload" id="dataUpload" />
                     </form>
 
@@ -116,10 +131,20 @@
                             <select id="dataSets" > <option value="">Select a dataset</option> </select>
                         </div>
                     </div>
+
+                    <div id="backendDatasets" class="card">
+                        <div class="card-body">
+                             Or select a dataset previously stored on our server:
+                            <select id="dataSets" > <option value="">Select a dataset</option> </select>
+                        </div>
+                    </div>
                     <!-- END UPLOAD DATA -->
+                    <div class="card" id="dvCSV"></div>          
                     <div class="card" id="dvCSV"></div>          
 
                     <div class="card">
+                        <div class="card-header">
+                            <h2 class="mb-0">Create error analysis dashboard</h2>
                         <div class="card-header">
                             <h2 class="mb-0">Create error analysis dashboard</h2>
                         </div>
@@ -129,11 +154,22 @@
                                 Error analysis helps identify cohorts of data with higher error rate than the overall benchmark. 
                                 These discrepancies might occur when the system or model underperforms for specific demographic groups or infrequently observed input conditions in the training data.
                             </p>
+                        <div class="card-body">
+                            <p class="card-text mb-2">
+                                Error analysis helps identify cohorts of data with higher error rate than the overall benchmark. 
+                                These discrepancies might occur when the system or model underperforms for specific demographic groups or infrequently observed input conditions in the training data.
+                            </p>
                         </div>
                         <form id="errorAnalysis" enctype="multipart/form-data" method="post"> {% csrf_token %}
                             <input type="submit" value="Apply" class="btn btn-primary btn-sm">
                         </form>
+                        <!-- <form id="errorAnalysis" enctype="multipart/form-data" method="post"> {% csrf_token %}
+                            <input type="submit" value="Apply" class="btn btn-primary btn-sm">
+                        </form> -->
+                        <button id="appBtn" onclick="myFunction()">Apply</button>
+                        <div id="end-page"></div>
                     </div>
+
 
                 </div>
             </div>
@@ -145,6 +181,22 @@
 
 <!-- Specific JS goes HERE -->
 {% block javascripts %}
+
+
+<script src="/static/assets/vendor/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+
+
+<script>
+    function myFunction()
+    {
+        body = document.getElementById("end-page");
+        var i = document.createElement("iframe");
+        i.src = "http://localhost:5001/";
+        i.width = "900";
+        i.height = "900";
+        body.appendChild(i);
+    }
+</script>
 
 
 <script src="/static/assets/vendor/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
@@ -185,67 +237,9 @@
     });
 </script>
 
-<!-- <script>
-    fetch(
-        "/listfiles",
-        {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        }
-
-    ).then((response) => {
-        return response.json();
-    }).then((data) => {
-        // selected
-        let params = new URLSearchParams(document.location.search);
-        let datasetName = params.get("datasetName");
-        if (datasetName == null) {
-            document.querySelector("#dataSets option").selected = true;
-        }
-        // console.log(data);
-        var select = document.getElementById("dataSets");
-        for (var i = 0; i < data["csv"].length; i++) {
-            var opt = data["csv"][i];
-            var el = document.createElement("option");
-            if (datasetName == opt) {
-                el.selected = true;
-            }
-            el.innerText = opt;
-            el.value = opt;
-            select.appendChild(el);
-        }
-    });
-
-    document.getElementById("dataSets").addEventListener("change", function () {
-        // document.getElementById("feature1").innerHTML = "";
-        fetch(
-            "/getfile?filename=" + this.value + "&table=true",
-            {
-                method: "GET",
-            }
-        ).then((response) => {
-            response.text().then((text) => {
-                document.getElementById("dvCSV").innerHTML = text;
-
-                let thead = document.querySelector("#dvCSV table tr");
-
-                // Array.from(thead.children).forEach((element) => {
-                //     let option = document.createElement("option");
-                //     option.value = element.innerText;
-                //     option.innerText = element.innerText;
-                //     document.getElementById("feature1").appendChild(option);
-                // });
-
-
-            });
-        });
-    });
-</script> -->
-
 <script type="text/javascript">
     let fileName='';
+    let modelName='';
     let modelName='';
     let Columns=[];
     $(function () 
@@ -266,6 +260,120 @@
         return cookieValue;
         }
         var csrftoken = getCookie('csrftoken');
+
+        //Post request to get the model name
+        var fd = new FormData();
+        fd.append('csrfmiddlewaretoken',csrftoken);
+        $.ajax({
+        type: "POST",
+        url: "getPKL",
+        data: fd,
+        contentType: false,
+        processData: false,
+        enctype: 'multipart/form-data'
+        }).done(function (data) {
+            var select = document.getElementById("models");         
+            for(model in data['models']) 
+                {            
+                    //List all models stored on our backend.
+                    select.options[select.options.length] = new Option(data['models'][model], data['models'][model]);
+                }
+        });
+
+        //When the user selects a model from our backend update the filename
+        $("#models").change(function()
+        {
+            modelName=$("#models").val();
+            var fd = new FormData();
+            fd.append('csrfmiddlewaretoken',csrftoken);
+            fd.append('modelName', modelName);
+        });
+
+
+        //Upload pkl file to backend
+        $("#mUpload").bind("click", function () 
+        {
+            var regex = /^([a-zA-Z0-9\s_\\.\-:\(\)])+(.pkl)$/;
+            if (regex.test($("#modUpload").val().toLowerCase())) 
+            {
+                if (typeof (FileReader) != "undefined") 
+                {
+                    var reader = new FileReader();
+                    reader.readAsText($("#modUpload")[0].files[0]);
+                    modelName=$("#modUpload")[0].files[0].name;
+                    //const blob = new Blob([$("#fileUpload")[0].files[0]], { type: 'text/csv' });
+                } 
+                else 
+                {
+                    alert("This browser does not support HTML5.");
+                }
+            } 
+            else 
+            {
+                alert("Please upload a valid PKL file.");
+            }
+        });
+
+        $("#modelUpload").submit(function (event) 
+        {
+            var fd = new FormData();
+            fd.append('csrfmiddlewaretoken',csrftoken);
+            fd.append('fileUpload', $("#modUpload")[0].files[0]);
+            $.ajax({
+            type: "POST",
+            url: "upload",
+            data: fd,
+            contentType: false,
+            processData: false,
+            enctype: 'multipart/form-data'
+            }).done(function (data) {
+            console.log(fd);
+            });
+            event.preventDefault();
+        });
+
+        //Post request to get the dataset names
+        var fd = new FormData();
+        fd.append('csrfmiddlewaretoken',csrftoken);
+        $.ajax({
+        type: "POST",
+        url: "getDataset",
+        data: fd,
+        contentType: false,
+        processData: false,
+        enctype: 'multipart/form-data'
+        }).done(function (data) {
+            var select = document.getElementById("dataSets");         
+            for(dataset in data['dataSets']) 
+                {            
+                    //List all datasets stored on our backend.
+                    select.options[select.options.length] = new Option(data['dataSets'][dataset], data['dataSets'][dataset]);
+                    
+                }
+        });
+
+        //When the user selects a dataset from our backend update the filename and display a preview of that dataset
+        $("#dataSets").change(function()
+        {
+            fileName=$("#dataSets").val();
+            var fd = new FormData();
+            fd.append('csrfmiddlewaretoken',csrftoken);
+            fd.append('fileName', fileName);
+            fd.append('method','view');
+            $.ajax({
+            type: "POST",
+            url: "",
+            data: fd,
+            contentType: false,
+            processData: false,
+            enctype: 'multipart/form-data'
+            }).done(function (data) {
+                $("#dvCSV").html('');
+                $("#dvCSV").append(data);
+            });
+
+        });
+
 
         //Post request to get the model name
         var fd = new FormData();
@@ -429,6 +537,7 @@
         });
         //Show dataset on upload.
 
+
         $("#datasetUpload").submit(function (event) 
         {
             var fd = new FormData();
@@ -452,23 +561,28 @@
             fd.append('fileName',fileName);
             fd.append('modelName',modelName);
             fd.append('method', 'errorAnalysis')
-
+            body = document.getElementById("end-page");
+            var i = document.createElement("iframe");
+            i.src = "http://localhost:49402/";
+            i.width = "900";
+            i.height = "900";
+            body.appendChild(i);
             //console.log(document.querySelector('#Impute'))
-            $.ajax({
-            type: "POST",
-            url: "",
-            data: fd,
-            contentType: false,
-            processData: false,
-            enctype: 'multipart/form-data'
-            }).done(function (data) {
-                body = document.getElementById("end-page");
-                var i = document.createElement("iframe");
-                i.src = "http://localhost:5010/";
-                i.width = "900";
-                i.height = "900";
-                body.appendChild(i);
-            }); 
+            // $.ajax({
+            // type: "POST",
+            // url: "",
+            // data: fd,
+            // contentType: false,
+            // processData: false,
+            // enctype: 'multipart/form-data'
+            // }).done(function (data) {
+            //     body = document.getElementById("end-page");
+            //     var i = document.createElement("iframe");
+            //     i.src = "http://localhost:49402/";
+            //     i.width = "900";
+            //     i.height = "900";
+            //     body.appendChild(i);
+            // }); 
             event.preventDefault();
         });
     });
