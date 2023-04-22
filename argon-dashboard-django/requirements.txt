@@ -13,5 +13,11 @@ whitenoise==5.3.0
 pandas==1.4.0
 numpy==1.21.2
 scikit-learn==1.24.2
+<<<<<<< HEAD
 mlflow==2.2.2
 google==3.0.0
+=======
+responsibleai==0.25.0
+raidwidgets==0.25.0
+fairlearn==0.8.0
+>>>>>>> 54485ed (Add everything)

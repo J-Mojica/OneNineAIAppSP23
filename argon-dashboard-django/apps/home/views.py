@@ -17,6 +17,7 @@ from .forms import UploadFileForm
 from .modelMonitoring import *
 from .datacleanup import *
 from .retrain import *
+from .erroranalysis import *
 import glob
 
 @login_required(login_url="/login/")
@@ -132,8 +133,15 @@ def modelReTraining(request):
 
 @login_required(login_url="/login/")
 def errorAnalysis(request):
-    context = {'segment': 'errorAnalysis'}
-    return render(request, 'home/errorAnalysis.html', context)
+    if request.method == 'POST':
+            if request.POST['method']=='view':
+                df=pd.read_csv('./users/'+request.user.username+'/'+request.POST['fileName'],skipinitialspace=True)
+                return HttpResponse(df.head(200).to_html(classes='dataframe table table-striped table-bordered dataTable no-footer'))
+            if request.POST['method']=='errorAnalysis':
+                port = createDashboard(request)
+                return HttpResponse(port)
+    else:
+        return render(request, 'home/errorAnalysis.html')
 
 @login_required(login_url="/login/")
 def useCases(request):
@@ -218,4 +226,4 @@ def getDatasetCols(request):
 
 def getPKL(request):
     data = [os.path.basename(x) for x in glob.glob('./users/'+request.user.username+'/*.pkl')]
-    return JsonResponse({'dataSets':data})
+    return JsonResponse({'models':data})

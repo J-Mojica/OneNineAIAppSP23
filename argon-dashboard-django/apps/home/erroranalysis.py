@@ -9,21 +9,23 @@ from django.core.files.storage import FileSystemStorage
 import pandas as pd
 import numpy as np
 import json as json
-import raiwidgets
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
 from raiwidgets import ErrorAnalysisDashboard
 import pickle
+import socket
 
-def createDashboard():
-    clf = pickle.load(open('./users/antran416/model.pkl', 'rb'))
-    df = pd.read_csv('./users/antran416/admission_prediction.csv')
-    target = ['admit']
-    y = df[target]
-    X = df.drop(target, axis = 1)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, train_size = 0.8, random_state = 0)
-    feature_names = clf.feature_names_in_
-    y_pred = clf.predict(X_test)
-    return ErrorAnalysisDashboard(dataset=X_test, true_y=np.ravel(y_test), features=feature_names, pred_y=y_pred)
-
-createDashboard()
+def createDashboard(request):
+    df=pd.read_csv('./users/'+request.user.username+'/'+request.POST['fileName'],skipinitialspace=True) #Turns all blank cells into NaN
+    model = pickle.load(open('./users/'+request.user.username+'/'+request.POST['modelName'], 'rb'))
+    training_features = model.feature_names_in_
+    column_names = set(df.columns)
+    testing_feature = list(column_names-set(training_features))
+    y_test = df[testing_feature]
+    X_test = df.drop(testing_feature, axis=1)
+    y_pred = model.predict(X_test)
+    # find a free port
+    # sock = socket.socket()
+    # sock.bind(('', 0))
+    # port = sock.getsockname()[1]
+    print(type(X_test), type(y_test), type(training_features), type(y_pred))
+    ErrorAnalysisDashboard(dataset=X_test, true_y=np.ravel(y_test), port=5010, features=training_features, pred_y=y_pred)
+    return 5010
