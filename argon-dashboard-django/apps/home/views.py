@@ -201,6 +201,9 @@ def getfile(request):
     if table == "true":
         df=pd.read_csv(os.path.join('./users/', request.user.username, filename),skipinitialspace=True)
         return HttpResponse(df.head(200).to_html(classes='dataframe table table-striped table-bordered dataTable no-footer'))
+    else:
+        with open(os.path.join('./users/', request.user.username, filename), 'r') as f:
+            return HttpResponse(f.read())
     
     return HttpResponse("")
 

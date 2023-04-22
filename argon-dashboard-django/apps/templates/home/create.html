@@ -1014,18 +1014,58 @@
             response.text().then((text) => {
                 document.getElementById("dvCSV").innerHTML = text;
 
-                let thead = document.querySelector("#dvCSV table tr");
+                // let thead = document.querySelector("#dvCSV table tr");
 
-                Array.from(thead.children).forEach((element) => {
-                    let option = document.createElement("option");
-                    option.value = element.innerText;
-                    option.innerText = element.innerText;
-                    document.getElementById("feature1").appendChild(option);
-                });
+                // Array.from(thead.children).forEach((element) => {
+                //     let option = document.createElement("option");
+                //     option.value = element.innerText;
+                //     option.innerText = element.innerText;
+                //     document.getElementById("feature1").appendChild(option);
+                // });
+
+
 
 
             });
         });
+
+
+
+
+
+
+
+        fetch(
+                "/getfile?filename=" + this.value + "&table=false",
+                {
+                    method: "GET",
+                }).then((response) => {
+                    response.text().then((text) => {
+
+                    console.log(text);
+            
+                    let columns = text.split("\n")[0].split(",");
+
+                    console.log(columns);
+
+                    columns.forEach((element) => {
+                        let option = document.createElement("option");
+                        option.value = element;
+                        option.innerText = element;
+                        document.getElementById("feature1").appendChild(option);
+                    });
+                }
+                )}
+
+            );
+
+
+
+
+
+
+
+
     });
 </script>
 
