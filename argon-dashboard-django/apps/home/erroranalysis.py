@@ -22,10 +22,10 @@ def createDashboard(request):
     y_test = df[testing_feature]
     X_test = df.drop(testing_feature, axis=1)
     y_pred = model.predict(X_test)
-    # find a free port
-    # sock = socket.socket()
-    # sock.bind(('', 0))
-    # port = sock.getsockname()[1]
+    #find a free port
+    sock = socket.socket()
+    sock.bind(('', 0))
+    port = sock.getsockname()[1]
     print(type(X_test), type(y_test), type(training_features), type(y_pred))
-    ErrorAnalysisDashboard(dataset=X_test, true_y=np.ravel(y_test), port=5010, features=training_features, pred_y=y_pred)
-    return 5010
+    ErrorAnalysisDashboard(dataset=X_test, true_y=np.ravel(y_test), port=port, features=training_features, pred_y=y_pred)
+    return port
